@@ -8,7 +8,7 @@ if (isset($_POST['riga'])) {
 }
 
 // Seleziona i post
-$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y - alle ore %H:%i', 'it_IT') AS niceDate FROM post ORDER BY creato_il DESC LIMIT $riga,3";
+$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y - alle ore %H:%i') AS niceDate FROM post ORDER BY creato_il DESC LIMIT $riga,3";
 $result = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
 
 while ($riga = mysqli_fetch_array($result)) {

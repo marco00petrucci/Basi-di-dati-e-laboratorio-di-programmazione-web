@@ -155,7 +155,7 @@ if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?no_access")
 				?>
 			</ul>
 
-			<a href="edit_account.php">
+			<a href="account.php">
 				<?php
 				// Avatar
 				$username = $_SESSION['user_session'];

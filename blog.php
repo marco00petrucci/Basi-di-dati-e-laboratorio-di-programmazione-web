@@ -117,7 +117,7 @@
 		if (!isset($_GET['testoCerca'])) { ?>
 			<h1>I BLOG DEL SITO:</h1>
 		<?php
-			$sql = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i', 'it_IT') AS niceDate FROM blog ORDER BY nome_blog ASC";
+			$sql = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog ORDER BY nome_blog ASC";
 			$blog_execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
 			while ($result = mysqli_fetch_assoc($blog_execution)) {
 				$cat_immagine = $result['immagine'];
@@ -166,7 +166,7 @@
 				$blog_execution = mysqli_query($conn, $blog_query) or die("Connessione fallita: " . mysqli_error($conn));
 				$blog_row = mysqli_fetch_assoc($blog_execution);
 				if (mysqli_num_rows($blog_execution) > 0) {
-					$query = "SELECT *, DATE_FORMAT(p.creato_il, '%W %d %M %Y, %H:%i', 'it_IT') AS niceDate FROM blog AS b, post AS p WHERE b.nome_blog = '$_GET[testoCerca]' AND b.nome_blog = p.nome_b ORDER BY p.creato_il DESC";
+					$query = "SELECT *, DATE_FORMAT(p.creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog AS b, post AS p WHERE b.nome_blog = '$_GET[testoCerca]' AND b.nome_blog = p.nome_b ORDER BY p.creato_il DESC";
 				}
 
 				// Se viene cercato una categoria
@@ -174,7 +174,7 @@
 				$cat_execution = mysqli_query($conn, $cat_query) or die("Connessione fallita: " . mysqli_error($conn));
 				$cat_row = mysqli_fetch_assoc($cat_execution);
 				if (mysqli_num_rows($cat_execution) > 0) {
-					$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i', 'it_IT') AS niceDate FROM post WHERE categoria = '$_GET[testoCerca]' ORDER BY creato_il DESC";
+					$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM post WHERE categoria = '$_GET[testoCerca]' ORDER BY creato_il DESC";
 				}
 				if (mysqli_num_rows($cat_execution) == 0 && mysqli_num_rows($blog_execution) == 0) {
 					echo '<p id="risultati">Nessun risultato per: "' . $_GET['testoCerca'] . '"! 🔎</p>';

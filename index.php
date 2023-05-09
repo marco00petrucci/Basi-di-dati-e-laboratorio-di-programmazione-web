@@ -211,7 +211,7 @@
             $allcount = $allcount_fetch['allcount'];
 
             // Seleziona tutti i post limitati di 5
-            $query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i', 'it_IT') AS niceDate FROM post ORDER BY creato_il DESC LIMIT 0,5";
+            $query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM post ORDER BY creato_il DESC LIMIT 0,5";
             $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
             if (mysqli_num_rows($execution) > 0) {
                 while ($riga = mysqli_fetch_assoc($execution)) {

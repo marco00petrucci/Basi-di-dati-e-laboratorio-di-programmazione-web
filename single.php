@@ -227,7 +227,7 @@ if (isset($_GET['id'])) {
 			<!-- Visualizza il post -->
 			<?php
 			if (isset($_GET['id'])) {
-				$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i', 'it_IT') AS niceDate FROM post WHERE id = '$_GET[id]'";
+				$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM post WHERE id = '$_GET[id]'";
 				$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
 				if (mysqli_num_rows($execution) > 0) {
 					while ($result = mysqli_fetch_assoc($execution)) {
@@ -273,7 +273,7 @@ if (isset($_GET['id'])) {
 
 				<!-- Visualizza commenti ed eventuale voto -->
 				<?php
-				$execution = mysqli_query($conn, "SELECT *, DATE_FORMAT(data_c, '%W %d %M %Y - alle ore %H:%i', 'it_IT') AS niceDate, u.avatar FROM commenti AS c, post AS p, users AS u WHERE c.stato = 1 AND p.id = c.id_post AND p.id = '$_GET[id]' AND c.username = u.username ORDER BY c.data_c") or die("Connessione fallita: " . mysqli_error($conn));
+				$execution = mysqli_query($conn, "SELECT *, DATE_FORMAT(data_c, '%W %d %M %Y - alle ore %H:%i') AS niceDate, u.avatar FROM commenti AS c, post AS p, users AS u WHERE c.stato = 1 AND p.id = c.id_post AND p.id = '$_GET[id]' AND c.username = u.username ORDER BY c.data_c") or die("Connessione fallita: " . mysqli_error($conn));
 				if (mysqli_num_rows($execution) > 0) {
 					while ($commento = mysqli_fetch_assoc($execution)) {
 						$id_c = $commento['id_c'];

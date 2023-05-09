@@ -265,7 +265,7 @@ if ((!isset($_SESSION['user_session'])) && (!isset($_GET['username']))) {
                     // Se non si cerca un altro account, visualizza i dati dell'account attivo nella sessione
                     else $username = $_SESSION['user_session'];
 
-                    $query = "SELECT *, DATE_FORMAT(add_data, '- membro dal %d %M %Y', 'it_IT') AS niceDate FROM users WHERE username = '$username'";
+                    $query = "SELECT *, DATE_FORMAT(add_data, '- membro dal %d %M %Y') AS niceDate FROM users WHERE username = '$username'";
                     $user_query = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
                     $row = mysqli_fetch_array($user_query);
                     $imageURL_selected = '../image/' . $row['avatar'];
@@ -432,7 +432,7 @@ if ((!isset($_SESSION['user_session'])) && (!isset($_GET['username']))) {
           <?php
           if (!isset($_GET['username'])) $user_username = $username;
           else $user_username = $_GET['username'];
-          $sql = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i', 'it_IT') AS niceDate FROM blog WHERE autore = '$user_username' OR co_autore = '$user_username' ORDER BY nome_blog ASC";
+          $sql = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog WHERE autore = '$user_username' OR co_autore = '$user_username' ORDER BY nome_blog ASC";
           $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
           if (mysqli_num_rows($execution) > 0) {
                while ($result = mysqli_fetch_assoc($execution)) {
