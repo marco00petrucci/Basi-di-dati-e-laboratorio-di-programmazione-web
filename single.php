@@ -8,6 +8,7 @@ if (isset($_GET['id'])) {
 	$id_post = $_GET['id'];
 	$query = "SELECT * FROM post WHERE id = '$id_post'";
 	$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+	if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?404");
 	$check_titolo = mysqli_fetch_assoc($execution);
 	$post_titolo = $check_titolo['titolo'];
 }
@@ -387,9 +388,7 @@ if (isset($_GET['id'])) {
 							</script>";
 					}
 				}
-				?>
 
-				<?php
 				// Se si è loggati si può sia votare che commentare
 				if (isset($_SESSION['user_session'])) { ?>
 					<fieldset style="background: linear-gradient(to bottom, rgba(194,194,194,1) 0%, rgba(194,194,194,1) 50%, rgba(255,255,255,.1) 100%); border-radius:10px">
@@ -598,6 +597,73 @@ if (isset($_GET['id'])) {
 						<p style='margin-left:2%'>Devi essere loggato per poter commentare! <a href='reg-login/reg-login.php?registrazione'>Registrati</a> o effettua il <a href='reg-login/reg-login.php?login'>login</a>!😉</p>";
 				?>
 			</div>
+
+			<!-- Post precedente -->
+			<?php
+			$prec_sql = "SELECT *, DATE_FORMAT(creato_il, '%d/%m/%Y') AS small_date FROM post WHERE id = ($_GET[id]-1)";
+			$prec_execution = mysqli_query($conn, $prec_sql) or die("Connessione fallita: " . mysqli_error($conn));
+
+			$succ_sql = "SELECT *, DATE_FORMAT(creato_il, '%d/%m/%Y') AS small_date FROM post WHERE id = ($_GET[id]+1)";
+			$succ_execution = mysqli_query($conn, $succ_sql) or die("Connessione fallita: " . mysqli_error($conn));
+
+			if (mysqli_num_rows($prec_execution) > 0 || mysqli_num_rows($succ_execution) > 0) {
+				$post_precedente = mysqli_fetch_assoc($prec_execution);
+				$p_id_prc = $post_precedente['id'];
+				$data_prc = $post_precedente['small_date'];
+				$categoria_prc = $post_precedente['categoria'];
+				$titolo_prc = $post_precedente['titolo'];
+				$autore_prc = $post_precedente['autore'];
+				$immagine_prc = $post_precedente['immagine'];
+
+				$post_successivo = mysqli_fetch_assoc($succ_execution);
+				$p_id_succ = $post_successivo['id'];
+				$data_succ = $post_successivo['small_date'];
+				$categoria_succ = $post_successivo['categoria'];
+				$titolo_succ = $post_successivo['titolo'];
+				$autore_succ = $post_successivo['autore'];
+				$immagine_succ = $post_successivo['immagine'];
+
+				if (mysqli_num_rows($prec_execution) > 0) :
+					echo "<div style='margin: 4% 0 0 10%; width:18%; float:left'>
+						<h2 style='width:100%'>Post precedente</h2>
+					    <div class='post' id='post_$p_id_prc' style='margin-left: -2%; padding:7%; width:100%'>
+					  		<a href='single.php?id=$p_id_prc'>
+								<img src='image/$immagine_prc' alt='Immagine post precedente' style='width:90%'>
+								<h4 style='margin:0 4%; text-align:left'>$titolo_prc</h4>
+					  		</a>
+							<p style='margin:0 4%'>
+								<a href='blog.php?testoCerca=$categoria_prc' style='color:rgb(99, 10, 13)'>
+									<b>$categoria_prc</b>
+								</a> - ";
+
+					if (isset($_SESSION['user_session']) && $autore_prc == $_SESSION['user_session']) echo "<a href='reg-login/account.php' style='color:rgb(99, 10, 13)'>$autore_prc</a> | $data_prc</p></div></div>";
+					else echo "<a href='reg-login/account.php?username=$autore_prc' style='color:rgb(99, 10, 13)'>$autore_prc</a> | $data_prc
+							</p>
+					  	</div>
+					  </div>";
+				endif;
+
+				if (mysqli_num_rows($succ_execution) > 0) :
+					echo "<div style='margin: 4% 30% 0 0; width:18%; float:right'>
+						<h2 style='width:100%'>Post successivo</h2>
+					    <div class='post' id='post_$p_id_succ' style='margin-left: -2%; padding:7%; width:100%'>
+					  		<a href='single.php?id=$p_id_succ'>
+								<img src='image/$immagine_succ' alt='Immagine post successivo' style='width:90%'>
+								<h4 style='margin:0 4%; text-align:left'>$titolo_succ</h4>
+					  		</a>
+							<p style='margin:0 4%'>
+								<a href='blog.php?testoCerca=$categoria_succ' style='color:rgb(99, 10, 13)'>
+									<b>$categoria_succ</b>
+								</a> - ";
+
+					if (isset($_SESSION['user_session']) && $autore_succ == $_SESSION['user_session']) echo "<a href='reg-login/account.php' style='color:rgb(99, 10, 13)'>$autore_succ</a> | $data_succ</p></div></div>";
+					else echo "<a href='reg-login/account.php?username=$autore_succ' style='color:rgb(99, 10, 13)'>$autore_succ</a> | $data_succ
+						</p>
+					  </div>
+					</div>";
+				endif;
+			}
+			?>
 		</article>
 
 		<aside>

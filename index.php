@@ -88,6 +88,15 @@
              </div>";
     }
 
+    // Se si entra in una pagina inesistente
+    if (isset($_GET['404'])) {
+        echo "<div class='avviso'>
+                  <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                  <p>Questa pagina non esiste!🐱‍💻</p>
+                  <script>setTimeout('window.location.href = \"index.php\"', 2500);</script>
+             </div>";
+    }
+
     // Se si è appena creato un blog
     if (isset($_GET['aggiungi_blog_post'])) {
         echo "<div class='avviso'>

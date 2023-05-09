@@ -2,8 +2,12 @@
 session_start();
 require('../db_connect.php');
 
-if ((!isset($_SESSION['user_session'])) && (!isset($_GET['username']))) {
-     header("Location: ../index.php?no_access");
+if ((!isset($_SESSION['user_session'])) && (!isset($_GET['username']))) header("Location: ../index.php?no_access");
+
+if (isset($_GET['username'])) {
+     $query = "SELECT username FROM users WHERE username = '$_GET[username]'";
+     $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+     if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?404");
 }
 ?>
 
