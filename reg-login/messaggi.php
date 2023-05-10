@@ -202,27 +202,9 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 	</main>
 
 	<img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-
-	<img src="../image/footer.svg" alt="Footer" >
+	
+	<img src="../image/footer.svg" alt="Footer"> 
 	<footer>
-		<div id="links">
-			
-			<a href="mailto: marco00petrucci@gmail.com">
-				<img src='../image/email_icon.png' class='icona statica other_icon_contattaci' alt='Icona email' title='Inviaci una email'>
-				<img src='../image/email_icon.gif' class='icona attiva other_icon_contattaci' alt='Icona email' title='Inviaci una email' style="margin:-22px 0 0 2px">
-			</a>
-			<a href='tel: +39 6218450969'>
-				<img src='../image/phone_icon.png' class='icona statica other_icon_contattaci' alt='Icona telefono' title='Telefonaci!'>
-				<img src='../image/phone_icon.gif' class='icona attiva other_icon_contattaci' alt='Icona telefono' title='Telefonaci!' style="margin:-22px 0 0 2px">
-			</a>
-			<a href="https://www.instagram.com/_marco00petrucci_/">
-				<img src="../image/Instagram_icon.svg" alt="Instagram icon" title="Seguici su Instagram!">
-			</a>
-			<a href="https://www.facebook.com/marco00petrucci/">
-				<img src="../image/Facebook_icon.svg" alt="Facebook icon" title="Seguici su Facebook!">
-			</a>
-		</div>
-
 		<a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>
 </body>

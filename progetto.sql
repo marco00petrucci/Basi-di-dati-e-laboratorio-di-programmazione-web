@@ -1,8 +1,8 @@
 --
 -- Database: progetto
 --
-CREATE DATABASE IF NOT EXISTS progetto DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE progetto;
+CREATE DATABASE IF NOT EXISTS my_bddbloggy DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE my_bddbloggy;
 
 --
 -- Struttura della tabella 'users'

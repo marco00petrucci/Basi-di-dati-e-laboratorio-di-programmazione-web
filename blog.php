@@ -4,7 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Bloggy | <?php if (isset($_GET["testoCerca"])) echo $_GET["testoCerca"]; else echo "Blog" ?></title>
+	<title>Bloggy | <?php if (isset($_GET["testoCerca"])) echo $_GET["testoCerca"];
+					else echo "Blog" ?></title>
 	<style>
 		@import url("index.css");
 		@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
@@ -316,18 +317,9 @@
 	</main>
 
 	<img src="image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-
-	<img src="image/footer.svg" alt="Footer">
+	
+	<img src="image/footer.svg" alt="Footer"> 
 	<footer>
-		<div id="links">
-			<a href="https://www.instagram.com/_marco00petrucci_/">
-				<img src="image/Instagram_icon.svg" alt="Instagram icon" title="Seguici su Instagram!">
-			</a>
-			<a href="https://www.facebook.com/marco00petrucci/">
-				<img src="image/Facebook_icon.svg" alt="Facebook icon" title="Seguici su Facebook!">
-			</a>
-		</div>
-
 		<a href="about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>
 </body>

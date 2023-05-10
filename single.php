@@ -11,7 +11,7 @@ if (isset($_GET['id'])) {
 	if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?404");
 	$check_titolo = mysqli_fetch_assoc($execution);
 	$post_titolo = $check_titolo['titolo'];
-}
+} else header("Location: ../index.php?404");
 ?>
 
 <!DOCTYPE html>
@@ -26,6 +26,29 @@ if (isset($_GET['id'])) {
 
 		main {
 			margin-top: 150px
+		}
+
+		.box .post {
+			margin-left: -2%;
+			padding: 7%;
+			width: 100%
+		}
+
+		.box h2 {
+			width: 100%
+		}
+
+		.box img {
+			width: 90%
+		}
+
+		.box h4 {
+			margin: 0 4%;
+			text-align: left
+		}
+
+		.box p {
+			margin: 0 4%
 		}
 	</style>
 	<link rel="icon" href="image/logo_icona.png" />
@@ -227,34 +250,31 @@ if (isset($_GET['id'])) {
 
 			<!-- Visualizza il post -->
 			<?php
-			if (isset($_GET['id'])) {
-				$query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM post WHERE id = '$_GET[id]'";
-				$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-				if (mysqli_num_rows($execution) > 0) {
-					while ($result = mysqli_fetch_assoc($execution)) {
-						$p_id = $result['id'];
-						$data = $result['niceDate'];
-						$categoria = $result['categoria'];
-						$titolo = $result['titolo'];
-						$autore = $result['autore'];
-						$contenuto = $result['contenuto'];
-						$immagine = $result['immagine'];
+			$query = mysqli_query($conn, "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM post WHERE id = '$_GET[id]'") or die("Connessione fallita: " . mysqli_error($conn));
+			if (mysqli_num_rows($query) > 0) {
+				while ($result = mysqli_fetch_assoc($query)) {
+					$p_id = $result['id'];
+					$data = $result['niceDate'];
+					$categoria = $result['categoria'];
+					$titolo = $result['titolo'];
+					$autore = $result['autore'];
+					$contenuto = $result['contenuto'];
+					$immagine = $result['immagine'];
 
-						// Stampa il post
-						echo "<div class='post' id='post_$p_id'>
-								<img src='image/$immagine' alt='Immagine post'>
-								<h1>$titolo</h1>
-								<p>
-									<a href='blog.php?testoCerca=$categoria' style='color:rgb(99, 10, 13)'>
-										<b>$categoria</b>
-									</a> - ";
+					// Stampa il post
+					echo "<div class='post' id='post_$p_id'>
+							<img src='image/$immagine' alt='Immagine post'>
+							<h1>$titolo</h1>
+							<p>
+								<a href='blog.php?testoCerca=$categoria' style='color:rgb(99, 10, 13)'>
+									<b>$categoria</b>
+								</a> - ";
 
-						if (isset($_SESSION['user_session']) && $autore == $_SESSION['user_session']) echo "<a href='reg-login/account.php' style='color:rgb(99, 10, 13)'>$autore</a> | ";
-						else echo "<a href='reg-login/account.php?username=$autore' style='color:rgb(99, 10, 13)'>$autore</a> | ";
-						echo ucfirst($data) . "</p>
+					if (isset($_SESSION['user_session']) && $autore == $_SESSION['user_session']) echo "<a href='reg-login/account.php' style='color:rgb(99, 10, 13)'>$autore</a> | ";
+					else echo "<a href='reg-login/account.php?username=$autore' style='color:rgb(99, 10, 13)'>$autore</a> | ";
+					echo ucfirst($data) . "</p>
 							<p>$contenuto</p><br>
 					 	</div>";
-					}
 				}
 			}
 			?>
@@ -359,9 +379,8 @@ if (isset($_GET['id'])) {
 					}
 
 					if ($nuovo_commento_ok) {
-						$sql = "UPDATE commenti SET commento = '$nuovo_commento' WHERE id_c = $_POST[id_c]";
-						$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-						if ($execution) {
+						$insert_comm = mysqli_query($conn, "UPDATE commenti SET commento = '$nuovo_commento' WHERE id_c = $_POST[id_c]") or die("Connessione fallita: " . mysqli_error($conn));
+						if ($insert_comm) {
 							echo "<script>
 									$('#$_POST[id_c] #error').fadeIn(400).html(\"&ensp;<img src='image/ajax-loader.gif' alt='Loader' />&ensp;Commento modificato! 😁\");
 									$('form#modifica_commento, #$_POST[id_c] #error').delay(2200).fadeOut();
@@ -378,9 +397,8 @@ if (isset($_GET['id'])) {
 
 				// Se viene scelto di eliminare un commento
 				if (isset($_GET['elimina_commento'])) {
-					$sql = "DELETE FROM commenti WHERE id_c = $_GET[elimina_commento]";
-					$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-					if ($execution) {
+					$delete_comm = mysqli_query($conn, "DELETE FROM commenti WHERE id_c = $_GET[elimina_commento]") or die("Connessione fallita: " . mysqli_error($conn));
+					if ($delete_comm) {
 						echo "<script>
 								$('#$_GET[elimina_commento] #error').fadeIn(400).html(\"&ensp;<img src='image/ajax-loader.gif' alt='Loader' />&ensp;Commento eliminato! 🗑\");
 								$('form#modifica_commento, #$_GET[elimina_commento] #error').delay(2200).fadeOut();
@@ -598,16 +616,14 @@ if (isset($_GET['id'])) {
 				?>
 			</div>
 
-			<!-- Post precedente -->
+			<!-- Post precedente e successivo -->
 			<?php
-			$prec_sql = "SELECT *, DATE_FORMAT(creato_il, '%d/%m/%Y') AS small_date FROM post WHERE id = ($_GET[id]-1)";
-			$prec_execution = mysqli_query($conn, $prec_sql) or die("Connessione fallita: " . mysqli_error($conn));
+			$prec_sql = mysqli_query($conn, "SELECT *, DATE_FORMAT(creato_il, '%d/%m/%Y') AS small_date FROM post WHERE id = ($_GET[id]-1)") or die("Connessione fallita: " . mysqli_error($conn));
 
-			$succ_sql = "SELECT *, DATE_FORMAT(creato_il, '%d/%m/%Y') AS small_date FROM post WHERE id = ($_GET[id]+1)";
-			$succ_execution = mysqli_query($conn, $succ_sql) or die("Connessione fallita: " . mysqli_error($conn));
+			$succ_sql = mysqli_query($conn, "SELECT *, DATE_FORMAT(creato_il, '%d/%m/%Y') AS small_date FROM post WHERE id = ($_GET[id]+1)") or die("Connessione fallita: " . mysqli_error($conn));
 
-			if (mysqli_num_rows($prec_execution) > 0 || mysqli_num_rows($succ_execution) > 0) {
-				$post_precedente = mysqli_fetch_assoc($prec_execution);
+			if (mysqli_num_rows($prec_sql) > 0 || mysqli_num_rows($succ_sql) > 0) {
+				$post_precedente = mysqli_fetch_assoc($prec_sql);
 				$p_id_prc = $post_precedente['id'];
 				$data_prc = $post_precedente['small_date'];
 				$categoria_prc = $post_precedente['categoria'];
@@ -615,7 +631,7 @@ if (isset($_GET['id'])) {
 				$autore_prc = $post_precedente['autore'];
 				$immagine_prc = $post_precedente['immagine'];
 
-				$post_successivo = mysqli_fetch_assoc($succ_execution);
+				$post_successivo = mysqli_fetch_assoc($succ_sql);
 				$p_id_succ = $post_successivo['id'];
 				$data_succ = $post_successivo['small_date'];
 				$categoria_succ = $post_successivo['categoria'];
@@ -623,35 +639,35 @@ if (isset($_GET['id'])) {
 				$autore_succ = $post_successivo['autore'];
 				$immagine_succ = $post_successivo['immagine'];
 
-				if (mysqli_num_rows($prec_execution) > 0) :
-					echo "<div style='margin: 4% 0 0 10%; width:18%; float:left'>
-						<h2 style='width:100%'>Post precedente</h2>
-					    <div class='post' id='post_$p_id_prc' style='margin-left: -2%; padding:7%; width:100%'>
-					  		<a href='single.php?id=$p_id_prc'>
-								<img src='image/$immagine_prc' alt='Immagine post precedente' style='width:90%'>
-								<h4 style='margin:0 4%; text-align:left'>$titolo_prc</h4>
-					  		</a>
-							<p style='margin:0 4%'>
-								<a href='blog.php?testoCerca=$categoria_prc' style='color:rgb(99, 10, 13)'>
-									<b>$categoria_prc</b>
-								</a> - ";
+				if (mysqli_num_rows($prec_sql) > 0) {
+					echo "<div class='box precedente' style='margin: 4% 0 0 10%; width:18%; float:left'>
+							<h2>Post precedente</h2>
+					    	<div class='post' id='post_$p_id_prc'>
+					  			<a href='single.php?id=$p_id_prc'>
+									<img src='image/$immagine_prc' alt='Immagine post precedente'>
+									<h4>$titolo_prc</h4>
+					  			</a>
+								<p>
+									<a href='blog.php?testoCerca=$categoria_prc' style='color:rgb(99, 10, 13)'>
+										<b>$categoria_prc</b>
+									</a> - ";
 
 					if (isset($_SESSION['user_session']) && $autore_prc == $_SESSION['user_session']) echo "<a href='reg-login/account.php' style='color:rgb(99, 10, 13)'>$autore_prc</a> | $data_prc</p></div></div>";
 					else echo "<a href='reg-login/account.php?username=$autore_prc' style='color:rgb(99, 10, 13)'>$autore_prc</a> | $data_prc
-							</p>
-					  	</div>
-					  </div>";
-				endif;
+								</p>
+							</div>
+						</div>";
+				}
 
-				if (mysqli_num_rows($succ_execution) > 0) :
-					echo "<div style='margin: 4% 30% 0 0; width:18%; float:right'>
-						<h2 style='width:100%'>Post successivo</h2>
-					    <div class='post' id='post_$p_id_succ' style='margin-left: -2%; padding:7%; width:100%'>
+				if (mysqli_num_rows($succ_sql) > 0) {
+					echo "<div class='box successivo' style='margin: 4% 30% 0 0; width:18%; float:right'>
+						<h2>Post successivo</h2>
+					    <div class='post' id='post_$p_id_succ'>
 					  		<a href='single.php?id=$p_id_succ'>
-								<img src='image/$immagine_succ' alt='Immagine post successivo' style='width:90%'>
-								<h4 style='margin:0 4%; text-align:left'>$titolo_succ</h4>
+								<img src='image/$immagine_succ' alt='Immagine post successivo'>
+								<h4>$titolo_succ</h4>
 					  		</a>
-							<p style='margin:0 4%'>
+							<p>
 								<a href='blog.php?testoCerca=$categoria_succ' style='color:rgb(99, 10, 13)'>
 									<b>$categoria_succ</b>
 								</a> - ";
@@ -661,7 +677,7 @@ if (isset($_GET['id'])) {
 						</p>
 					  </div>
 					</div>";
-				endif;
+				}
 			}
 			?>
 		</article>
@@ -693,8 +709,8 @@ if (isset($_GET['id'])) {
 					$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
 					while ($categoria = mysqli_fetch_assoc($execution)) {
 						echo "<li>
-                                		<a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
-                              	</li>";
+                                <a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
+                              </li>";
 					}
 					?>
 				</ul>
@@ -759,19 +775,9 @@ if (isset($_GET['id'])) {
 	</main>
 
 	<img src="image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-
+	
 	<img src="image/footer.svg" alt="Footer">
 	<footer>
-		<div id="links">
-
-			<a href="https://www.instagram.com/_marco00petrucci_/">
-				<img src="image/Instagram_icon.svg" alt="Instagram icon" title="Seguici su Instagram!">
-			</a>
-			<a href="https://www.facebook.com/marco00petrucci/">
-				<img src="image/Facebook_icon.svg" alt="Facebook icon" title="Seguici su Facebook!">
-			</a>
-		</div>
-
 		<a href="about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>
 </body>

@@ -44,3 +44,4 @@ while ($riga = mysqli_fetch_array($result)) {
         </div>";
     }
 }
+?>

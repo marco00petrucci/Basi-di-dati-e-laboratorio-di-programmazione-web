@@ -295,20 +295,10 @@ if (isset($_GET['login'])) $nome_pagina = "Login";
                </form>
           <?php
           endif; ?>
-
      </main>
-
-     <img src="../image/footer.svg" alt="Footer" >
-     <footer>
-          <div id="links">
-               <a href="https://www.instagram.com/_marco00petrucci_/">
-                    <img src="../image/Instagram_icon.svg" alt="Instagram icon" title="Seguici su Instagram!">
-               </a>
-               <a href="https://www.facebook.com/marco00petrucci/">
-                    <img src="../image/Facebook_icon.svg" alt="Facebook icon" title="Seguici su Facebook!">
-               </a>
-          </div>
-
+	
+	<img src="../image/footer.svg" alt="Footer"> 
+	<footer>
           <a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
      </footer>
 </body>

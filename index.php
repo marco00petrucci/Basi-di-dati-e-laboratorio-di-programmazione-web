@@ -47,8 +47,7 @@
     </script>
 </head>
 
-<body>
-
+<body id="home">
     <?php
     session_start();
     include "db_connect.php";
@@ -295,12 +294,12 @@
                 <ul>
                     <?php
                     $sql = "SELECT DISTINCT categoria FROM post";
-					$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-					while ($categoria = mysqli_fetch_assoc($execution)) {
-						echo "<li>
+                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($categoria = mysqli_fetch_assoc($execution)) {
+                        echo "<li>
                                 	<a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
                              </li>";
-					}
+                    }
                     ?>
                 </ul>
             </div>
@@ -364,18 +363,9 @@
     </main>
 
     <img src="image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-
-    <img src="image/footer.svg" alt="Footer" >
-    <footer>
-        <div id="links">
-            <a href="https://www.instagram.com/_marco00petrucci_/">
-                <img src="image/Instagram_icon.svg" alt="Instagram icon" title="Seguici su Instagram!">
-            </a>
-            <a href="https://www.facebook.com/marco00petrucci/">
-                <img src="image/Facebook_icon.svg" alt="Facebook icon" title="Seguici su Facebook!">
-            </a>
-        </div>
-
+	
+	<img src="image/footer.svg" alt="Footer"> 
+	<footer>
         <a href="about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
     </footer>
 </body>

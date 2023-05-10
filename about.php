@@ -8,6 +8,19 @@
     <style>
         @import url("index.css");
         @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+
+        #contatti {
+            width: 40%;
+            margin: 2% auto;
+            color: #fff;
+            text-align: center
+        }
+
+        #contatti img {
+            width: 36px;
+            vertical-align: middle;
+            padding: 0 .5%
+        }
     </style>
     <link rel="icon" href="image/logo_icona.png" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -131,7 +144,7 @@
                 $query = "SELECT nome, cognome, email, telefono FROM users WHERE username = '$_SESSION[user_session]'";
                 $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
                 $riga = mysqli_fetch_assoc($execution);
-                $nome = $riga['nome'] . " ". $riga['cognome'];
+                $nome = $riga['nome'] . " " . $riga['cognome'];
                 $email = $riga['email'];
                 $telefono = $riga['telefono'];
                 echo "<input type='text' class='input_box' name='Anome' id='Anome' placeholder='Nome completo' value='$nome' style='width:52%'><br>
@@ -149,6 +162,26 @@
             </button>
 
         </form>
+
+        <div id="contatti">
+            <h4>Questo sito è stato realizzato da Marco Petrucci per l'esame di Basi di dati e laboratorio di programmazione Web a.a 2020/2021</h4>
+            <h5>I miei contatti:</h5>
+            <a href="https://github.com/marco00petrucci">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/GitHub_Mark.png/640px-GitHub_Mark.png" alt="GitHub" style="background:#fff; border-radius:100%; padding:0">
+            </a>
+            <a href="https://www.linkedin.com/in/marco00petrucci/">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/81/LinkedIn_icon.svg" alt="LinkedIn">
+            </a>
+            <a href="https://www.instagram.com/_marco00petrucci_/">
+                <img src="https://camo.githubusercontent.com/ed48b74796d8f74f1a76e427118aca9036eeb0560162e447b9c84af8e5264f06/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f392f39352f496e7374616772616d5f6c6f676f5f323032322e737667" alt="Instagram">
+            </a>
+            <a href="https://www.facebook.com/marco00petrucci/">
+                <img src="https://camo.githubusercontent.com/6636b87a05fbdfce3fce16198cf3ab8ce09d55f6687182691884814be8d875ac/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f622f62382f323032315f46616365626f6f6b5f69636f6e2e737667" alt="Facebook">
+            </a>
+            <a href="https://www.youtube.com/@marco00petrucci">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube">
+            </a>
+        </div>
 
         <aside>
             <!-- Blog -->
@@ -174,12 +207,12 @@
                 <ul>
                     <?php
                     $sql = "SELECT DISTINCT categoria FROM post";
-					$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-					while ($categoria = mysqli_fetch_assoc($execution)) {
-						echo "<li>
+                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($categoria = mysqli_fetch_assoc($execution)) {
+                        echo "<li>
                                 <a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
                               </li>";
-					}
+                    }
                     ?>
                 </ul>
             </div>
@@ -244,17 +277,8 @@
 
     <img src="image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
 
-    <img src="image/footer.svg" alt="Footer" >
+    <img src="image/footer.svg" alt="Footer">    
     <footer>
-        <div id="links">
-            <a href="https://www.instagram.com/_marco00petrucci_/">
-                <img src="image/Instagram_icon.svg" alt="Instagram icon" title="Seguici su Instagram!">
-            </a>
-            <a href="https://www.facebook.com/marco00petrucci/">
-                <img src="image/Facebook_icon.svg" alt="Facebook icon" title="Seguici su Facebook!">
-            </a>
-        </div>
-
         <a href="about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
     </footer>
 

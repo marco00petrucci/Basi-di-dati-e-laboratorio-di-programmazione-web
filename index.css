@@ -321,8 +321,8 @@ main {
 }
 
 main h1:not(.blog h1,
-.post h1,
-.avviso h1) {
+    .post h1,
+    .avviso h1) {
     color: #fff;
     font-family: 'Bungee';
     font-size: 3em;
@@ -1062,16 +1062,18 @@ aside li a:hover {
     top: 90%;
     right: 2%;
     z-index: 5;
+    -webkit-filter: invert(100%);
+    filter: invert(100%)
 }
 
 #button_top:hover {
-    -webkit-filter: invert(100%);
-    filter: invert(100%);
+    -webkit-filter: invert(0);
+    filter: invert(0)
 }
 
 img[alt="Footer"] {
     user-select: none;
-    margin-bottom: -4px;
+    margin-bottom: -4px
 }
 
 footer {
@@ -1079,7 +1081,7 @@ footer {
     background: #FF476C;
     text-align: center;
     box-shadow: 0px -2px 30px 0px rgba(0, 0, 0, 0.75);
-    bottom: 0;
+    bottom: 0
 }
 
 footer a {
@@ -1091,21 +1093,127 @@ footer a:last-child:hover {
     text-decoration: underline;
 }
 
-#links {
-    margin-bottom: .5%;
-}
-
-#links img {
-    width: 30px;
-    padding: 0 .8%;
-}
-
 
 /*----------------------------*/
 
+@media screen and (max-width:1200px) {
+    header {
+        margin: 1.5% 2% 1%;
+    }
+
+    header>a.dx {
+        margin: 4% 4% 0 0
+    }
+
+    header #utente {
+        margin-top: 3.5%
+    }
+
+    header #cerca {
+        margin-top: 3%
+    }
+
+    header #subnav {
+        top: 45px
+    }
+
+    #home h3#descrizione{
+        margin:1% auto !important;
+        text-align: center !important
+    }
+
+    main h1:not(.blog h1,
+        .post h1,
+        .avviso h1) {
+        font-size: 2em
+    }
+
+    img[alt="Logo Bloggy"] {
+        width: 28%
+    }
+
+
+    h2 {
+        width: 80% !important
+    }
+
+    .blog {
+        width: 90%;
+        display: block;
+        margin: 2% auto 3% !important
+    }
+
+    .blog:hover {
+        width: 90.3%;
+    }
+
+    .post,
+    #sezione_commenti {
+        margin: 1% auto 2%;
+        width: 90%
+    }
+
+    .box {
+        width: 40% !important;
+        display: inline-block;
+        vertical-align: top;
+        float: none !important
+    }
+
+    .box h2 {
+        font-size: 1em
+    }
+
+    .box.precedente {
+        margin: 1% 10% 0 3% !important
+    }
+
+    .box.successivo {
+        margin: 1% 0 0 3% !important
+    }
+
+    aside {
+        width: 90% !important;
+        position: relative !important;
+        margin: 1% auto !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    .visualizza_dati_utente {
+        margin: 0 3% 3%
+    }
+
+    #avatar_form {
+        float: none;
+        padding-bottom: 5%;
+    }
+
+    #account h3 {
+        width: 80%
+    }
+
+    .form_center,
+    #contatti {
+        width: 90% !important;
+        margin: 0 auto !important
+    }
+
+    .blog_categoria div {
+        float: none;
+        width: 100%;
+        margin-bottom: 5%;
+    }
+
+    #target-content td:nth-child(7) img {
+        width: 100px !important
+    }
+}
+
 @media screen and (min-width:600px) {
     footer a {
-        font-size: 0.75em;
+        font-size: 0.75em
     }
 }
 
@@ -1114,8 +1222,9 @@ footer a:last-child:hover {
     #open_sidenav,
     a.dx,
     #user_name {
-        font-size: 1em;
+        font-size: 1em
     }
+
     footer a {
         font-size: .9em
     }
@@ -1126,14 +1235,15 @@ footer a:last-child:hover {
     #open_sidenav,
     a.dx,
     #user_name {
-        font-size: 1.2em;
+        font-size: 1.2em
     }
 }
 
 @media screen and (min-width:1600px) {
     #invia_commento {
-        bottom: 8px;
+        bottom: 8px
     }
+
     #subnav {
         top: 57px
     }
@@ -1144,21 +1254,21 @@ footer a:last-child:hover {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #f1f1f1
 }
 
 ::-webkit-scrollbar-thumb {
     background: #fd3459;
     border-radius: 50px;
-    border: .1px #f1f1f1 solid;
+    border: .1px #f1f1f1 solid
 }
 
 ::-moz-selection {
     color: white;
-    background: red;
+    background: red
 }
 
 ::selection {
     color: white;
-    background: #fd3459;
+    background: #fd3459
 }
