@@ -16,6 +16,12 @@ body {
     background: rgb(70, 0, 7);
 }
 
+
+#menu-btn,
+#menu-icon {
+    display: none
+}
+
 #animation_container {
     position: fixed;
     top: 0;
@@ -1086,7 +1092,7 @@ footer {
 
 footer a {
     color: #fff;
-    font-size: 0.65em
+    font-size: .75em
 }
 
 footer a:last-child:hover {
@@ -1117,8 +1123,18 @@ footer a:last-child:hover {
         top: 45px
     }
 
-    #home h3#descrizione{
-        margin:1% auto !important;
+    nav#menu {
+        margin: 1.5% 0;
+        padding: 0% 6%;
+        list-style: none;
+        overflow: hidden;
+        clear: both;
+        max-height: 0;
+        transition: .3s ease-out;
+    }
+
+    #home h3#descrizione {
+        margin: 1% auto !important;
         text-align: center !important
     }
 
@@ -1209,15 +1225,81 @@ footer a:last-child:hover {
     #target-content td:nth-child(7) img {
         width: 100px !important
     }
+
+    #risultati {
+        width: 90%;
+        margin: 0 auto
+    }
 }
 
-@media screen and (min-width:600px) {
-    footer a {
-        font-size: 0.75em
+@media screen and (max-width:950px) {
+    #menu-icon {
+        margin: 3% 2% 0 0;
+        padding: 13px 5px;
+        cursor: pointer;
+        user-select: none;
+        float: right;
+        position: relative;
+        display: block;
+        background: #fd3459;
+        border-radius: 100%
+    }
+
+    #menu-icon #nav-icon {
+        height: 2px;
+        width: 20px;
+        background: #fff;
+        display: block;
+        position: relative;
+        transition: 0.2s ease-out
+    }
+
+    #menu-icon:hover {
+        background-color: rgba(255, 0, 4, 0.6);
+        border-radius: 200px;
+        transition: .2s;
+    }
+
+    #menu-icon #nav-icon:before,
+    #menu-icon #nav-icon:after {
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        content: "";
+        display: block;
+        position: absolute;
+        transition: .2s ease-out;
+    }
+
+    #menu-icon #nav-icon:before {
+        top: 6px;
+    }
+
+    #menu-icon #nav-icon:after {
+        top: -6px;
+    }
+
+    #menu-btn:checked~nav#menu {
+        max-height: 250px;
+    }
+
+    #menu-btn:checked~#menu-icon #nav-icon:before {
+        transform: rotate(-45deg);
+        top: 0;
+    }
+
+    #menu-btn:checked~#menu-icon #nav-icon {
+        background: transparent !important;
+    }
+
+    #menu-btn:checked~#menu-icon #nav-icon:after {
+        transform: rotate(45deg);
+        top: 0;
     }
 }
 
 @media screen and (min-width:768px) {
+
     #sezioni_btn,
     #open_sidenav,
     a.dx,
@@ -1231,6 +1313,7 @@ footer a:last-child:hover {
 }
 
 @media screen and (min-width:1200px) {
+
     #sezioni_btn,
     #open_sidenav,
     a.dx,

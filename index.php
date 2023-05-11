@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="it">
+<!DOCTYPE html>
+<html>
 
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,17 @@
     <style>
         @import url("index.css");
         @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+
+        #load_data_message {
+            margin: 0 32%;
+        }
+
+        #load_data_message p {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1% 0%;
+            text-align: center;
+        }
     </style>
     <link rel="icon" href="image/logo_icona.png" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -16,31 +27,43 @@
     <script src="sfondo.js"></script>
     <script>
         $(function() {
+            var start = 0,
+                action = 'inattivo';
 
-            $(window).scroll(function() {
+            if (action == 'inattivo') {
+                action = 'attivo';
+                load_posts(start);
+            }
 
-                // Gestore "Visualizza post allo scroll"
-                var position = $(window).scrollTop(); // Conta di quanto viene scrollata la pagina
-                var bottom = $(document).height() - $(window).height(); // Altezza totale della pagina
-
-                if (position >= bottom) { // Se la pagina viene scrollata fino alla fine
-                    var riga = Number($('#riga').val()); // Prende il valore del bottone input #riga
-                    var allcount = Number($('#tutto').val()); // Prende il valore del bottone input
-                    riga += 3; // Aggiungi 3 post ogni volta che si scrolla fino in fondo
-
-                    if (riga <= allcount) {
-                        $('#riga').val(riga);
-                        $.ajax({
-                            url: 'load_post.php',
-                            type: 'post',
-                            data: {
-                                riga: riga
-                            },
-                            success: function(response) {
-                                $(".post:last").after(response).show().fadeIn(1000);
-                            }
-                        });
+            function load_posts(start) {
+                $.ajax({
+                    url: "load_post.php",
+                    method: "POST",
+                    data: {
+                        start: start
+                    },
+                    cache: false,
+                    success: function(data) {
+                        $('#attach_posts').append(data);
+                        if (data == '') {
+                            $('#load_data_message').html("<p>Non ci sono altri post</p>");
+                            action = 'attivo';
+                        } else {
+                            $('#load_data_message').html("<p>Caricamento....&nbsp;<img src='../image/ajax-loader.gif' alt='Loader' /></p>");
+                            action = "inattivo";
+                        }
                     }
+                });
+            }
+
+            // Visualizza 3 post in più se la pagina viene scrollata fino alla fine
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() > $("#attach_posts").height() && action == 'inattivo') {
+                    action = 'attivo';
+                    start += 3;
+                    setTimeout(function() {
+                        load_posts(start)
+                    }, 1000);
                 }
             });
         });
@@ -121,86 +144,93 @@
     </div>
 
     <header>
+        <input type="checkbox" id="menu-btn" />
+        <label id="menu-icon" for="menu-btn">
+            <span id="nav-icon"></span>
+        </label>
+
         <!-- Logo sito -->
         <a href="index.php">
             <img src="image/logo.png" id="logo" alt="Logo" />
         </a>
 
-        <!-- Cerca nel sito -->
-        <form action="blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
-            <input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
-            <button type="submit" id="cercaBtn">
-                <img src="image/search_icon.svg" alt="Cerca">
-            </button>
-            <div id="autocompletamento"></div>
-        </form>
+        <nav id="menu">
+            <!-- Cerca nel sito -->
+            <form action="blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
+                <input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
+                <button type="submit" id="cercaBtn">
+                    <img src="image/search_icon.svg" alt="Cerca">
+                </button>
+                <div id="autocompletamento"></div>
+            </form>
 
-        <?php
-        // Se non si è loggati al sito mostra l'opzione login/registrazione
-        if (!isset($_SESSION['user_session'])) { ?>
-            <a href="reg-login/reg-login.php?login" class="dx" title="Effettua il login">Login</a>
-            <span id="divisore" class="dx">|</span>
-            <a href="reg-login/reg-login.php?registrazione" class="dx" title="Registrati">Registrati</a>
+            <?php
+            // Se non si è loggati al sito mostra l'opzione login/registrazione
+            if (!isset($_SESSION['user_session'])) { ?>
+                <a href="reg-login/reg-login.php?login" class="dx" title="Effettua il login">Login</a>
+                <span id="divisore" class="dx">|</span>
+                <a href="reg-login/reg-login.php?registrazione" class="dx" title="Registrati">Registrati</a>
 
-        <?php
-            // Se si è loggati, mostra l'avatar, l'username e il dropdown con le varie opzioni
-        } else { ?>
-            <div id="utente">
-                <span id='dropdown_btn'>▾</span>
-                <ul id="subnav">
-                    <?php
+            <?php
+                // Se si è loggati, mostra l'avatar, l'username e il dropdown con le varie opzioni
+            } else { ?>
+                <div id="utente">
+                    <span id='dropdown_btn'>▾</span>
+                    <ul id="subnav">
+                        <?php
 
-                    // Verifica se l'utente è un admin
-                    $username = $_SESSION['user_session'];
-                    $query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
-                    $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-                    if (mysqli_num_rows($execution) > 0) {
-                        while (mysqli_fetch_array($execution)) { ?>
+                        // Verifica se l'utente è un admin
+                        $username = $_SESSION['user_session'];
+                        $query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
+                        $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+                        if (mysqli_num_rows($execution) > 0) {
+                            while (mysqli_fetch_array($execution)) { ?>
 
-                            <!-- Se l'utente È un admin mostra tutti gli elementi: -->
+                                <!-- Se l'utente È un admin mostra tutti gli elementi: -->
+                                <li id="go_to_dashboard">Dashboard</li>
+                                <li id="add_blog">Aggiungi blog</li>
+                                <li id="manage_comments">Gestisci commenti</li>
+                                <li id="manage_users">Gestisci utenti</li>
+                                <li id="manage_messaggi">Gestisci messaggi</li>
+                                <li id="logout">
+                                    <img src="image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
+                                    <img src="image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
+                                </li>
+                            <?php
+                            }
+                        } else { ?>
+
+                            <!-- Se l'utente NON è un admin mostra questi elementi: -->
                             <li id="go_to_dashboard">Dashboard</li>
                             <li id="add_blog">Aggiungi blog</li>
-                            <li id="manage_comments">Gestisci commenti</li>
-                            <li id="manage_users">Gestisci utenti</li>
-                            <li id="manage_messaggi">Gestisci messaggi</li>
                             <li id="logout">
                                 <img src="image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
                                 <img src="image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
                             </li>
                         <?php
                         }
-                    } else { ?>
+                        ?>
+                    </ul>
 
-                        <!-- Se l'utente NON è un admin mostra questi elementi: -->
-                        <li id="go_to_dashboard">Dashboard</li>
-                        <li id="add_blog">Aggiungi blog</li>
-                        <li id="logout">
-                            <img src="image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
-                            <img src="image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
-                        </li>
-                    <?php
-                    }
-                    ?>
-                </ul>
-
-                <a href="reg-login/account.php">
-                    <?php
-                    // Avatar
-                    $username = $_SESSION['user_session'];
-                    $avatar_query = "SELECT avatar FROM users WHERE username = '$username'";
-                    $avatar = mysqli_query($conn, $avatar_query) or die("Connessione fallita: " . mysqli_error($conn));
-                    if (mysqli_num_rows($avatar) > 0) {
-                        $row = mysqli_fetch_array($avatar);
-                        $imageURL = 'image/' . $row["avatar"];
-                        echo "<img src = '$imageURL' id='user_icon' alt='Avatar'/>";
-                    } ?>
-                    <p class="dx" id="user_name"><?php echo ucfirst($_SESSION['user_session']) ?></p>
-                </a>
-            </div>
-        <?php
-        } ?>
-        <!-- Sezione about -->
-        <a href="about.php" class="dx" title="About">About</a>
+                    <a href="reg-login/account.php">
+                        <?php
+                        // Avatar
+                        $username = $_SESSION['user_session'];
+                        $avatar_query = "SELECT avatar FROM users WHERE username = '$username'";
+                        $avatar = mysqli_query($conn, $avatar_query) or die("Connessione fallita: " . mysqli_error($conn));
+                        if (mysqli_num_rows($avatar) > 0) {
+                            $row = mysqli_fetch_array($avatar);
+                            $imageURL = 'image/' . $row["avatar"];
+                            echo "<img src = '$imageURL' id='user_icon' alt='Avatar'/>";
+                        } ?>
+                        <p class="dx" id="user_name"><?php echo ucfirst($_SESSION['user_session']) ?></p>
+                    </a>
+                </div>
+            <?php
+            } ?>
+            <!-- Sezione about -->
+            <a href="about.php" class="dx" title="About">About</a>
+        </nav>
     </header>
 
     <nav id="nav_1"></nav>
@@ -211,63 +241,8 @@
             <h1>BENVENUTO SU <img src="image/logo.png" alt="Logo Bloggy">!</h1>
             <h3 id="descrizione" style="margin: -1.5% 0% 0 34%; text-align:left">...Il sito per condividere le passioni con tutti!</h3>
 
-            <?php
-            // Conta il numero totale di post
-            $count_post = "SELECT count(*) AS allcount FROM post";
-            $allcount_result = mysqli_query($conn, $count_post) or die("Connessione fallita: " . mysqli_error($conn));
-            $allcount_fetch = mysqli_fetch_array($allcount_result);
-            $allcount = $allcount_fetch['allcount'];
-
-            // Seleziona tutti i post limitati di 5
-            $query = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM post ORDER BY creato_il DESC LIMIT 0,5";
-            $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-            if (mysqli_num_rows($execution) > 0) {
-                while ($riga = mysqli_fetch_assoc($execution)) {
-                    $id = $riga['id'];
-                    $data = $riga['niceDate'];
-                    $categoria = $riga['categoria'];
-                    $titolo = $riga['titolo'];
-                    $autore = $riga['autore'];
-                    $contenuto = $riga['contenuto'];
-                    $immagine = $riga['immagine'];
-
-                    // Stampa i post
-                    echo "<div class='post' id='post_$id'>
-                            <a href='single.php?id=$id' title='Visita il post \"$titolo\"!' style='color:rgb(99, 10, 13)'>
-                                <img src='image/$immagine' alt='Immagine post'>
-                                <h1>$titolo</h1>
-                            </a>
-                            <p>
-								<a href='blog.php?testoCerca=$categoria' style='color:rgb(99, 10, 13)'>
-									<b>$categoria</b>
-								</a> - ";
-
-                    if (isset($_SESSION['user_session']) && $autore == $_SESSION['user_session']) echo "<a href='reg-login/account.php' style='color:rgb(99, 10, 13)'>$autore</a> | ";
-                    else echo "<a href='reg-login/account.php?username=$autore' style='color:rgb(99, 10, 13)'>$autore</a> | ";
-                    echo ucfirst($data) . "</p>";
-
-                    // Se i caratteri del contenuto sono superiori a 400 allora mostra solo quelli
-                    if (strlen($contenuto) > 400) {
-                        echo "<p>" . substr($contenuto, 0, 400) . '...</p><br>
-                        </div>';
-                    } else {
-                        echo "<p>$contenuto</p><br>
-                        </div>";
-                    }
-                }
-            }
-            // Se non ci sono post
-            else {
-                echo "<p id='risultati' style='width:40%; margin: 1% 30%'>Non ci sono blog al momento...😪
-                        <a href='reg-login/new_blog.php'>Aggiungine uno!</a>
-                     </p>";
-            }
-            ?>
-            <!-- Conteggio post -->
-            <input type="hidden" id="riga" name="riga" value="0">
-
-            <!-- Totale post -->
-            <input type="hidden" id="tutto" value="<?php echo $allcount; ?>">
+            <div id="attach_posts"></div>
+            <div id="load_data_message"></div>
         </article>
 
         <aside>
@@ -363,9 +338,9 @@
     </main>
 
     <img src="image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="image/footer.svg" alt="Footer"> 
-	<footer>
+
+    <img src="image/footer.svg" alt="Footer">
+    <footer>
         <a href="about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
     </footer>
 </body>
