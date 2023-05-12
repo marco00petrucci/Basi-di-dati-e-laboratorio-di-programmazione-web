@@ -107,15 +107,16 @@ if (isset($_POST['reg_btn'])) {
 // Verifica il funzionamento del login
 if (isset($_POST['login_btn'])) {
      $username = trim($_POST['Lusername']);
-     $password = trim($_POST['Lpassword']);
-     $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-     $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-     $result = mysqli_fetch_assoc($execution);
-     $password = password_verify($result['password'], $password);
-     if ($result['password'] == $password) {
-          echo "Login effettuato";
-          $_SESSION['user_session'] = $username;
-     } else echo "Login non effettuato";
+     $find_username = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+     if (mysqli_num_rows($find_username) > 0) {
+          $result_user = mysqli_fetch_assoc($find_username);
+          $hash_user = $result_user['password'];
+          $password = trim($_POST['Lpassword']);
+          if (password_verify($password, $hash_user)) {
+               echo "Login effettuato";
+               $_SESSION['user_session'] = $username;
+          } else echo "Password errata";
+     } else echo "Username non trovato";
 }
 
 // Modifica campi user al click del bottone cambia
@@ -214,4 +215,3 @@ if (isset($_POST['invia_commento'])) {
      } else echo "Dati corrotti";
 }
 mysqli_close($conn);
-?>

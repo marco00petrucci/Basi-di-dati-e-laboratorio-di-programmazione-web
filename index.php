@@ -78,7 +78,6 @@
     // Se si sceglie di fare il logout
     if (isset($_GET['logout']) && isset($_SESSION['user_session'])) {
         unset($_SESSION['user_session']);
-        session_destroy();
         if (session_destroy()) {
             echo "<div class='avviso'>
                     <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>

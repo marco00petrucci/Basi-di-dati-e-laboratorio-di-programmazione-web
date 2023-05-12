@@ -1107,29 +1107,8 @@ footer a:last-child:hover {
         margin: 1.5% 2% 1%;
     }
 
-    header>a.dx {
-        margin: 4% 4% 0 0
-    }
-
-    header #utente {
-        margin-top: 3.5%
-    }
-
     header #cerca {
         margin-top: 3%
-    }
-
-    header #subnav {
-        top: 45px
-    }
-
-    nav#menu {
-        margin: 1.5% 0;
-        padding: 0% 6%;
-        overflow: hidden;
-        clear: both;
-        max-height: 0;
-        transition: .3s ease-out;
     }
 
     #home h3#descrizione {
@@ -1232,16 +1211,21 @@ footer a:last-child:hover {
 }
 
 @media screen and (max-width:950px) {
+    #animation_container {
+        display: none;
+    }
+
     #menu-icon {
         margin: 3% 2% 0 0;
-        padding: 13px 5px;
+        padding: 13px 4px;
         cursor: pointer;
         user-select: none;
         float: right;
         position: relative;
         display: block;
         background: #fd3459;
-        border-radius: 100%
+        border-radius: 100%;
+        z-index: 9999;
     }
 
     #menu-icon #nav-icon {
@@ -1279,7 +1263,10 @@ footer a:last-child:hover {
     }
 
     #menu-btn:checked~nav#menu {
-        max-height: 250px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 10% 5% 0 0;
     }
 
     #menu-btn:checked~#menu-icon #nav-icon:before {
@@ -1294,6 +1281,90 @@ footer a:last-child:hover {
     #menu-btn:checked~#menu-icon #nav-icon:after {
         transform: rotate(45deg);
         top: 0;
+    }
+
+    nav#menu {
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 100%;
+        max-width: 0;
+        background: #fd3459;
+        transition: .3s ease-out;
+    }
+
+    #cerca {
+        float: right;
+        margin: 1.4% 0;
+        padding: 1px;
+        border-radius: 20px;
+        transition: .5s;
+        width: 180px;
+        background: rgba(255, 255, 255, 1);
+    }
+
+    #testoCerca {
+        border: none;
+        outline: none;
+        border-radius: 30px;
+        font-size: 15px;
+        transition: .5s;
+        visibility: visible;
+        width: 140px;
+        height: 26px;
+        margin: 2px 0 0 3px;
+        padding: 0 2% 0 4%;
+        color: rgba(0, 0, 0, .7);
+    }
+
+    header #utente {
+        margin-top: 3.5%;
+        clear: both;
+    }
+
+    #subnav {
+        margin-top: 69px;
+        width: 180px;
+        display: block !important;
+        filter: none;
+        position: static;
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    header .dx {
+        color: #000 !important;
+        margin: 0;
+        padding: 5px 10px;
+        width: 158px;
+        text-align: center;
+        border-bottom: 3px solid firebrick;
+        background: #fff;
+        border-radius: 5px;
+        transition: .5s;
+    }
+
+    #utente>a {
+        display: block;
+        margin-top: -284px;
+    }
+
+    #menu>a {
+        clear: both;
+        margin: -80px 7px 0px 0px
+    }
+
+    #user_icon {
+        margin-left: 4%;
+        margin-top: 3px;
+        position: absolute;
+    }
+
+    #dropdown_btn {
+        display: none;
     }
 }
 
