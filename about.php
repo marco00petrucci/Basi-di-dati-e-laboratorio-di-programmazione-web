@@ -189,15 +189,12 @@
                 <h4><a href="blog.php">Blog</a></h4>
                 <ul>
                     <?php
-                    $sql = "SELECT * FROM blog ORDER BY creato_il DESC LIMIT 10";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($recent = mysqli_fetch_assoc($execution)) {
-                        $blog = $recent['nome_blog'];
+                    $find_blog = mysqli_query($conn, "SELECT nome_blog FROM blog ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($nome_blog = mysqli_fetch_assoc($find_blog)) {
                         echo "<li>
-                                <a href='blog.php?testoCerca=$blog'>$blog</a>
+                                <a href='blog.php?testoCerca=$nome_blog[nome_blog]'>$nome_blog[nome_blog]</a>
                               </li>";
-                    }
-                    ?>
+                    } ?>
                 </ul>
             </div>
 
@@ -206,12 +203,11 @@
                 <h4>Categorie</h4>
                 <ul>
                     <?php
-                    $sql = "SELECT DISTINCT categoria FROM post";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($categoria = mysqli_fetch_assoc($execution)) {
+                    $find_cat = mysqli_query($conn, "SELECT DISTINCT categoria FROM post LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($categoria = mysqli_fetch_assoc($find_cat)) {
                         echo "<li>
                                 <a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
-                              </li>";
+                             </li>";
                     }
                     ?>
                 </ul>
@@ -222,15 +218,12 @@
                 <h4>Post recenti</h4>
                 <ul>
                     <?php
-                    $sql = "SELECT * FROM post ORDER BY creato_il DESC LIMIT 10";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($recent = mysqli_fetch_assoc($execution)) {
-                        $id = $recent['id'];
+                    $find_post = mysqli_query($conn, "SELECT id, titolo FROM post ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($post = mysqli_fetch_assoc($find_post)) {
                         echo "<li>
-                                <a href='single.php?id=$id'>$recent[titolo]</a>
+                                <a href='single.php?id=$post[id]'>$post[titolo]</a>
                               </li>";
-                    }
-                    ?>
+                    } ?>
                 </ul>
             </div>
 
@@ -240,18 +233,14 @@
                 <ul>
                     <?php
                     // Cerca gli utenti registrati nel database
-                    $sql = "SELECT * FROM users ORDER BY add_data ASC LIMIT 10";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                    $execution = mysqli_query($conn, "SELECT username, avatar FROM users ORDER BY add_data ASC LIMIT 5") or die("Connessione fallita: " . mysqli_error($conn));
                     while ($utenti_registrati = mysqli_fetch_assoc($execution)) {
                         $username = $utenti_registrati['username'];
                         $imageURL = 'image/' . $utenti_registrati["avatar"];
 
-
                         // Conta quanti blog hanno gli utenti registrati
-                        $numero_blog = "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'";
-                        $count_execution = mysqli_query($conn, $numero_blog) or die("Connessione fallita: " . mysqli_error($conn));
-                        $row = mysqli_fetch_array($count_execution);
-                        $count = $row['count_blog'] . " blog";
+                        $count_blog = mysqli_query($conn, "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+                        $count = mysqli_fetch_array($count_blog)['count_blog'] . " blog";
                         if ($count == "0 blog") $count = "Nessun blog";
 
                         if (isset($_SESSION['user_session']) && $username == $_SESSION['user_session']) {
@@ -269,6 +258,7 @@
                                 </li>";
                         }
                     }
+                    mysqli_close($conn);
                     ?>
                 </ul>
             </div>
@@ -277,7 +267,7 @@
 
     <img src="image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
 
-    <img src="image/footer.svg" alt="Footer">    
+    <img src="image/footer.svg" alt="Footer">
     <footer>
         <a href="about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
     </footer>

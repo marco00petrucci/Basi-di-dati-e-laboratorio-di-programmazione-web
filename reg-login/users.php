@@ -4,12 +4,9 @@ require('../db_connect.php');
 
 // Verifica se l'utente è un admin ed è registrato al blog
 $username = $_SESSION['user_session'];
-$query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
-$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+$execution = mysqli_query($conn, "SELECT admin FROM users WHERE username = '$username' AND admin = 1") or die("Connessione fallita: " . mysqli_error($conn));
 
-if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
-	header("Location: ../index.php?no_access");
-}
+if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) header("Location: ../index.php?no_access");
 ?>
 
 <!DOCTYPE html>
@@ -48,13 +45,12 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 	$time = time();
 
 	// Se si sceglie di aggiungere un amministratore
-	if (isset($_GET['editUP_admin'])) {
-		$Usql = "UPDATE users SET admin = 1, reso_admin_da = '$username' WHERE username = '$_GET[editUP_admin]'";
-		$exec = mysqli_query($conn, $Usql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($exec) {
+	if (isset($_GET['add_admin'])) {
+		$add_admin = mysqli_query($conn, "UPDATE users SET admin = 1, reso_admin_da = '$username' WHERE username = '$_GET[add_admin]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($add_admin) {
 			echo "<div class='avviso'>
 					<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-					<p>L'utente \"$_GET[editUP_admin]\" adesso è un amministratore!</p>
+					<p>L'utente \"$_GET[add_admin]\" adesso è un amministratore!</p>
 					<script>setTimeout(\"window.location.href = 'users.php'\", 2500);</script>
 	  			</div>";
 		} else {
@@ -67,13 +63,12 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 	}
 
 	// Se si sceglie di togliere un amministratore
-	if (isset($_GET['editDOWN_admin'])) {
-		$Usql = "UPDATE users SET admin = 0, reso_admin_da = NULL WHERE username = '$_GET[editDOWN_admin]'";
-		$exec = mysqli_query($conn, $Usql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($exec) {
+	if (isset($_GET['del_admin'])) {
+		$del_admin = mysqli_query($conn, "UPDATE users SET admin = 0, reso_admin_da = NULL WHERE username = '$_GET[del_admin]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($del_admin) {
 			echo "<div class='avviso'>
 					<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-					<p>L'utente \"$_GET[editDOWN_admin]\" adesso non è più un amministratore!</p>
+					<p>L'utente \"$_GET[del_admin]\" adesso non è più un amministratore!</p>
 					<script>setTimeout(\"window.location.href = 'users.php'\", 2500);</script>
 	  			</div>";
 		} else {
@@ -96,9 +91,8 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 	}
 
 	if (isset($_GET['delete_admin'])) {
-		$sql = "DELETE FROM users WHERE username = '$_GET[delete_admin]'";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($execution) {
+		$del_user = mysqli_query($conn, "DELETE FROM users WHERE username = '$_GET[delete_admin]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($del_user) {
 			echo "<div class='avviso'>
 					<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
 					<p>L'utente \"$_GET[delete_admin]\" è stato eliminato dal sito!</p>
@@ -217,9 +211,8 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				<?php
 				// Effettua la query negli utenti amministratori
 				$admin_num = 1;
-				$sql = "SELECT * FROM users WHERE admin = 1 ORDER BY add_data ASC";
-				$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-				while ($result = mysqli_fetch_assoc($execution)) {
+				$admin_users = mysqli_query($conn, "SELECT * FROM users WHERE admin = 1 ORDER BY add_data ASC") or die("Connessione fallita: " . mysqli_error($conn));
+				while ($result = mysqli_fetch_assoc($admin_users)) {
 					$admin_id = $result['id'];
 					$admin_avatar = $result['avatar'];
 					$imageURL = '../image/' . $admin_avatar;
@@ -240,14 +233,14 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 					// Se l'utente è quello loggato al sito
 					if ($admin_username == $_SESSION['user_session']) {
 						echo "<td>
-                              		<a href='account.php'>$admin_username</a>
-                         		</td>";
+								<a href='account.php'>$admin_username</a>
+							</td>";
 					}
 					// Se l'utente NON è quello loggato al sito
 					else {
 						echo "<td>
-                              		<a href='account.php?username=$admin_username'>$admin_username</a>
-                         		</td>";
+								<a href='account.php?username=$admin_username'>$admin_username</a>
+							</td>";
 					}
 
 					echo "<td><a href='mailto:$admin_email'>$admin_email</a></td>";
@@ -255,34 +248,34 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 					// Se l'utente che ha aggiunto l'utente selezionato come admin è l'utente loggato al sito
 					if ($reso_admin_da == $_SESSION['user_session']) {
 						echo "<td>
-                              		<a href='account.php'>$reso_admin_da</a>
-                         		</td>";
+								<a href='account.php'>$reso_admin_da</a>
+							</td>";
 					}
 					// Se l'utente che ha aggiunto l'utente selezionato come admin NON è l'utente loggato al sito
 					else {
 						echo "<td>
-                              		<a href='account.php?username=$reso_admin_da'>$reso_admin_da</a>
-                         		</td>";
+								<a href='account.php?username=$reso_admin_da'>$reso_admin_da</a>
+							</td>";
 					}
 
 					echo "<td>$admin_add_data</td>
-						<td style='width:6%; text-align:center'>";
+						  <td style='width:6%; text-align:center'>";
 
 					// Se l'utente non è quello loggato al sito mostra le azioni
 					if ($admin_username != $_SESSION['user_session']) {
-						echo "<a href='users.php?editDOWN_admin=$admin_username'>
+						echo "<a href='users.php?del_admin=$admin_username'>
 								<img class='icona statica unapprove' src='../image/meno.png' alt='Rimuovi utente dagli admin' title='Rimuovi utente dagli admin'>
 								<img class='icona attiva unapprove' src='../image/meno.gif' alt='Rimuovi utente dagli admin' title='Rimuovi utente dagli admin'>
 							</a> |
 							<a href='users.php?prepare_delete_admin=$admin_username'>
 								<img class='icona statica delete' src='../image/trash_icon.png' alt='Elimina utente' title='Elimina utente'>
-                                   	<img class='icona attiva delete' src='../image/trash_icon.gif' alt='Elimina utente' title='Elimina utente'>
+                                <img class='icona attiva delete' src='../image/trash_icon.gif' alt='Elimina utente' title='Elimina utente'>
 							</a>
 						</td>
 					</tr>";
 					}
 					// Se l'utente è quello loggato al sito non mostrare azioni
-					else echo "−</tr>";
+					else echo "-</tr>";
 					$admin_num++;
 				}
 				?>
@@ -307,9 +300,8 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				<?php
 				// Effettua la query negli utenti normali
 				$user_num = 1;
-				$sql = "SELECT * FROM users WHERE admin = 0 ORDER BY add_data ASC";
-				$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-				while ($result = mysqli_fetch_assoc($execution)) {
+				$normal_users = mysqli_query($conn, "SELECT * FROM users WHERE admin = 0 ORDER BY add_data ASC") or die("Connessione fallita: " . mysqli_error($conn));
+				while ($result = mysqli_fetch_assoc($normal_users)) {
 					$user_id = $result['id'];
 					$user_avatar = $result['avatar'];
 					$imageURL = '../image/' . $user_avatar;
@@ -329,26 +321,27 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 							<td><a href='mailto:$user_email'>$user_email</a></td>
 							<td>$user_add_data</td>
 							<td style='width:6%; text-align:center'>
-								<a href='users.php?editUP_admin=$user_username'>
+								<a href='users.php?add_admin=$user_username'>
 									<img class='icona statica approva' src='../image/plus.png' alt='Aggiungi utente come admin' title='Aggiungi utente come admin'>
 									<img class='icona attiva approva' src='../image/plus.gif' alt='Aggiungi utente come admin' title='Aggiungi utente come admin'>
 								</a>|
 								<a href='users.php?prepare_delete_admin=$user_username'>
 									<img class='icona statica delete' src='../image/trash_icon.png' alt='Elimina utente' title='Elimina utente'>
-                                   		<img class='icona attiva delete' src='../image/trash_icon.gif' alt='Elimina utente' title='Elimina utente'>
+                                   	<img class='icona attiva delete' src='../image/trash_icon.gif' alt='Elimina utente' title='Elimina utente'>
 								</a>
 							</td>
 						</tr>";
 					$user_num++;
 				}
+				mysqli_close($conn);
 				?>
 			</tbody>
 		</table>
 	</main>
 
 	<img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
+
+	<img src="../image/footer.svg" alt="Footer">
 	<footer>
 		<a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>

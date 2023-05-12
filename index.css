@@ -1126,7 +1126,6 @@ footer a:last-child:hover {
     nav#menu {
         margin: 1.5% 0;
         padding: 0% 6%;
-        list-style: none;
         overflow: hidden;
         clear: both;
         max-height: 0;

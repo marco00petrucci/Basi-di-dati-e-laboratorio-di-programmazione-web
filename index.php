@@ -78,6 +78,7 @@
     // Se si sceglie di fare il logout
     if (isset($_GET['logout']) && isset($_SESSION['user_session'])) {
         unset($_SESSION['user_session']);
+        session_destroy();
         if (session_destroy()) {
             echo "<div class='avviso'>
                     <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
@@ -89,13 +90,12 @@
 
     // Se si sceglie di cancellare l'account
     if (isset($_GET['disiscrizione']) && isset($_SESSION['user_session']) && $_GET['disiscrizione'] == "eliminato") {
-        $Dquery = "DELETE FROM users WHERE username = '$_SESSION[user_session]'";
-        mysqli_query($conn, $Dquery) or die("Connessione fallita: " . mysqli_error($conn));
+        mysqli_query($conn, "DELETE FROM users WHERE username = '$_SESSION[user_session]'") or die("Connessione fallita: " . mysqli_error($conn));
         unset($_SESSION['user_session']);
         if (session_destroy()) {
             echo "<div class='avviso'>
                     <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Disiscrizione dal sito effettuata!</p>
+                    <p>Hai correttamente cancellato il tuo account.</p>
                     <script>setTimeout('window.location.href = \"index.php\"', 2500);</script>
                  </div>";
         }
@@ -105,7 +105,7 @@
     if (isset($_GET['no_access'])) {
         echo "<div class='avviso'>
                   <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                  <p>Non puoi accedere a questa pagina!🐱‍💻</p>
+                  <p>Non puoi accedere a questa pagina!</p>
                   <script>setTimeout('window.location.href = \"index.php\"', 2500);</script>
              </div>";
     }
@@ -114,7 +114,7 @@
     if (isset($_GET['404'])) {
         echo "<div class='avviso'>
                   <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                  <p>Questa pagina non esiste!🐱‍💻</p>
+                  <p>Questa pagina non esiste!</p>
                   <script>setTimeout('window.location.href = \"index.php\"', 2500);</script>
              </div>";
     }
@@ -251,15 +251,12 @@
                 <h4><a href="blog.php">Blog</a></h4>
                 <ul>
                     <?php
-                    $sql = "SELECT * FROM blog ORDER BY creato_il DESC LIMIT 10";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($recent = mysqli_fetch_assoc($execution)) {
-                        $blog = $recent['nome_blog'];
+                    $find_blog = mysqli_query($conn, "SELECT nome_blog FROM blog ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($nome_blog = mysqli_fetch_assoc($find_blog)) {
                         echo "<li>
-                                <a href='blog.php?testoCerca=$blog'>$blog</a>
+                                <a href='blog.php?testoCerca=$nome_blog[nome_blog]'>$nome_blog[nome_blog]</a>
                               </li>";
-                    }
-                    ?>
+                    } ?>
                 </ul>
             </div>
 
@@ -268,11 +265,10 @@
                 <h4>Categorie</h4>
                 <ul>
                     <?php
-                    $sql = "SELECT DISTINCT categoria FROM post";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($categoria = mysqli_fetch_assoc($execution)) {
+                    $find_cat = mysqli_query($conn, "SELECT DISTINCT categoria FROM post LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($categoria = mysqli_fetch_assoc($find_cat)) {
                         echo "<li>
-                                	<a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
+                                <a href='blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
                              </li>";
                     }
                     ?>
@@ -284,15 +280,12 @@
                 <h4>Post recenti</h4>
                 <ul>
                     <?php
-                    $sql = "SELECT * FROM post ORDER BY creato_il DESC LIMIT 10";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($recent = mysqli_fetch_assoc($execution)) {
-                        $id = $recent['id'];
+                    $find_post = mysqli_query($conn, "SELECT id, titolo FROM post ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                    while ($post = mysqli_fetch_assoc($find_post)) {
                         echo "<li>
-                                <a href='single.php?id=$id'>$recent[titolo]</a>
+                                <a href='single.php?id=$post[id]'>$post[titolo]</a>
                               </li>";
-                    }
-                    ?>
+                    } ?>
                 </ul>
             </div>
 
@@ -302,18 +295,14 @@
                 <ul>
                     <?php
                     // Cerca gli utenti registrati nel database
-                    $sql = "SELECT * FROM users ORDER BY add_data ASC LIMIT 10";
-                    $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                    $execution = mysqli_query($conn, "SELECT username, avatar FROM users ORDER BY add_data ASC LIMIT 5") or die("Connessione fallita: " . mysqli_error($conn));
                     while ($utenti_registrati = mysqli_fetch_assoc($execution)) {
                         $username = $utenti_registrati['username'];
                         $imageURL = 'image/' . $utenti_registrati["avatar"];
 
-
                         // Conta quanti blog hanno gli utenti registrati
-                        $numero_blog = "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'";
-                        $count_execution = mysqli_query($conn, $numero_blog) or die("Connessione fallita: " . mysqli_error($conn));
-                        $row = mysqli_fetch_array($count_execution);
-                        $count = $row['count_blog'] . " blog";
+                        $count_blog = mysqli_query($conn, "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+                        $count = mysqli_fetch_array($count_blog)['count_blog'] . " blog";
                         if ($count == "0 blog") $count = "Nessun blog";
 
                         if (isset($_SESSION['user_session']) && $username == $_SESSION['user_session']) {
@@ -331,6 +320,7 @@
                                 </li>";
                         }
                     }
+                    mysqli_close($conn);
                     ?>
                 </ul>
             </div>

@@ -2,9 +2,7 @@
 session_start();
 require('../db_connect.php');
 
-if (!isset($_SESSION['user_session'])) {
-	header("Location: ../index.php?no_access");
-}
+if (!isset($_SESSION['user_session'])) header("Location: ../index.php?no_access");
 
 // Se si decide di modificare il post
 if (isset($_GET['modifica'])) $sql = "SELECT * FROM post WHERE id = '$_GET[modifica]'";
@@ -23,9 +21,8 @@ $contenuto = $result['contenuto'];
 
 // Verifica se l'utente è un admin o è proprietario del post: se non lo è reinderizza alla home
 $username = $_SESSION['user_session'];
-$query = "SELECT * FROM users WHERE username = '$username' AND (admin = 1 OR username = '$autore')";
-$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?no_access");
+$check_auth = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username' AND (admin = 1 OR username = '$autore')") or die("Connessione fallita: " . mysqli_error($conn));
+if (mysqli_num_rows($check_auth) == 0) header("Location: ../index.php?no_access");
 ?>
 
 <!DOCTYPE html>
@@ -71,16 +68,14 @@ if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?no_access")
 		}
 		$image_post_directory = "../image/" . basename($nuova_immagine);
 
-		$sql = "UPDATE post SET categoria = '$categoria', titolo = '$titolo', autore = '$autore', contenuto = '$contenuto', immagine = '$nuova_immagine' WHERE id = '$_POST[update_post_by_title]'";
-
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($execution) {
+		$edit_post = mysqli_query($conn, "UPDATE post SET categoria = '$categoria', titolo = '$titolo', autore = '$autore', contenuto = '$contenuto', immagine = '$nuova_immagine' WHERE id = '$_POST[update_post_by_title]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($edit_post) {
 			move_uploaded_file($nuova_immagine, $image_post_directory);
 			header("Location: dashboard.php?post_modificato");
 		} else {
 			echo "<div class='avviso'>
                     <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-				<p>Qualcosa è andato storto! 😣</p>
+					<p>Qualcosa è andato storto! 😣</p>
                     <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
                </div>";
 		}
@@ -88,14 +83,12 @@ if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?no_access")
 
 	// Se si pigia il bottone per eliminare il post
 	if (isset($_POST['post_delete'])) {
-		$sql = "DELETE FROM post WHERE id = '$_POST[delete_post_by_title]'";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($execution) {
-			header("Location: dashboard.php?post_eliminato");
-		} else {
+		$del_post = mysqli_query($conn, "DELETE FROM post WHERE id = '$_POST[delete_post_by_title]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($del_post) header("Location: dashboard.php?post_eliminato");
+		else {
 			echo "<div class='avviso'>
                     <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-				<p>Qualcosa è andato storto! 😣</p>
+					<p>Qualcosa è andato storto! 😣</p>
                     <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
                </div>";
 		}
@@ -260,12 +253,13 @@ if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?no_access")
 			</form>
 		<?php
 		endif;
+		mysqli_close($conn);
 		?>
 	</main>
 
 	<img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
+
+	<img src="../image/footer.svg" alt="Footer">
 	<footer>
 		<a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>

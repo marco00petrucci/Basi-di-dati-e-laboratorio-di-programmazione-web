@@ -2,18 +2,14 @@
 session_start();
 require('../db_connect.php');
 
-if (!isset($_SESSION['user_session'])) {
-     header("Location: ../index.php?no_access");
-}
+if (!isset($_SESSION['user_session'])) header("Location: ../index.php?no_access");
 
-if (isset($_GET["page"])) {
-     $page = $_GET["page"];
-} else $page = 1;
+if (isset($_GET["page"])) $page = $_GET["page"];
+else $page = 1;
 
 $limit = 2;
 $start_from = ($page - 1) * $limit;
-$query = "SELECT * FROM post ORDER BY id ASC LIMIT $start_from, $limit";
-mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+mysqli_query($conn, "SELECT * FROM post ORDER BY id ASC LIMIT $start_from, $limit") or die("Connessione fallita: " . mysqli_error($conn));
 ?>
 
 <!DOCTYPE html>
@@ -67,19 +63,19 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
           // Se il nuovo nome del blog è uguale a quello vecchio
           if ($nuovo_nome_blog == $_POST['vecchio_nome_blog'] && $nuovo_co_autore == $_POST['vecchio_co_autore']) {
                echo "<div class='avviso'>
-                    <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Non hai modificato niente!</p>
-                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                         <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                         <p>Non hai modificato niente!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           }
 
           // Se non viene inserito un nome nuovo
           else if (empty($nuovo_nome_blog)) {
                echo "<div class='avviso'>
-                    <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Inserisci un nuovo nome al blog, che non sia vuoto!</p>
-                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                         <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                         <p>Inserisci un nuovo nome al blog, che non sia vuoto!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           }
 
           // Se è tutto apposto, aggiorna il nome del blog
@@ -95,36 +91,35 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
                $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
                if ($execution) {
                     echo "<div class='avviso'>
-                         <h1>🤩&nbsp;AVVENUTO!</h1>
-                         <p>Blog aggiornato!</p>
-                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-                    </div>";
+                              <h1>🤩&nbsp;AVVENUTO!</h1>
+                              <p>Blog aggiornato!</p>
+                              <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                         </div>";
                } else {
                     echo "<div class='avviso'>
-                         <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                         <p>Qualcosa è andato storto... Perpiacere riprova!</p>
-                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-                    </div>";
+                              <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                              <p>Qualcosa è andato storto... Perpiacere riprova!</p>
+                              <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                         </div>";
                }
           }
      }
 
      // Se si sceglie di eliminare un blog
      if (isset($_GET['delete_blog'])) {
-          $sql = "DELETE FROM blog WHERE nome_blog = $_GET[delete_blog]";
-          $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-          if ($execution) {
+          $del_blog = mysqli_query($conn, "DELETE FROM blog WHERE nome_blog = $_GET[delete_blog]") or die("Connessione fallita: " . mysqli_error($conn));
+          if ($del_blog) {
                echo "<div class='avviso'>
-                    <h1>🤩&nbsp;AVVENUTO!</h1>
-                    <p>Blog eliminato!</p>
-                    <script>setTimeout(\"window.location.href = '../index.php'\", 2500);</script>
-               </div>";
+                         <h1>🤩&nbsp;AVVENUTO!</h1>
+                         <p>Blog eliminato!</p>
+                         <script>setTimeout(\"window.location.href = '../index.php'\", 2500);</script>
+                    </div>";
           } else {
                echo "<div class='avviso'>
-                  <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                  <p>Qualcosa è andato storto... Perpiacere riprova!</p>
-                  <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                         <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                         <p>Qualcosa è andato storto... Perpiacere riprova!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           }
      }
 
@@ -135,76 +130,74 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
           // Se il nuovo nome della categoria è uguale a quello vecchio
           if ($nuovo_nome_categoria == $_POST['vecchio_nome_categoria']) {
                echo "<div class='avviso'>
-                    <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Non hai cambiato il nome della categoria!</p>
-                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                         <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                         <p>Non hai cambiato il nome della categoria!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           }
 
           // Se non viene inserito un nome nuovo
           else if (empty($nuovo_nome_categoria)) {
                echo "<div class='avviso'>
-                    <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Inserisci un nuovo nome alla categoria, che non sia vuoto!</p>
-                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                         <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                         <p>Inserisci un nuovo nome alla categoria, che non sia vuoto!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           }
 
           // Se è tutto apposto, aggiorna il nome della categoria
           else {
-               $sql = "UPDATE post SET categoria = '$_POST[nuovo_nome_categoria]' WHERE categoria = '$_POST[vecchio_nome_categoria]'";
-               $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-               if ($execution) {
+               $new_name_cat = mysqli_query($conn, "UPDATE post SET categoria = '$_POST[nuovo_nome_categoria]' WHERE categoria = '$_POST[vecchio_nome_categoria]'") or die("Connessione fallita: " . mysqli_error($conn));
+               if ($new_name_cat) {
                     echo "<div class='avviso'>
-                         <h1>🤩&nbsp;AVVENUTO!</h1>
-                         <p>Nome della categoria cambiato!</p>
-                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-                    </div>";
+                              <h1>🤩&nbsp;AVVENUTO!</h1>
+                              <p>Nome della categoria cambiato!</p>
+                              <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                         </div>";
                } else {
                     echo "<div class='avviso'>
-                         <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                         <p>Qualcosa è andato storto... Perpiacere riprova!</p>
-                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-                    </div>";
+                              <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                              <p>Qualcosa è andato storto... Perpiacere riprova!</p>
+                              <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                         </div>";
                }
           }
      }
 
      // Se si sceglie di eliminare una categoria
      if (isset($_GET['delete_categoria'])) {
-          $sql = "DELETE FROM post WHERE categoria = $_GET[delete_categoria]";
-          $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-          if ($execution) {
+          $del_cat = mysqli_query($conn, "DELETE FROM post WHERE categoria = $_GET[delete_categoria]") or die("Connessione fallita: " . mysqli_error($conn));
+          if ($del_cat) {
                echo "<div class='avviso'>
-                    <h1>🤩&nbsp;AVVENUTO!</h1>
-                    <p>Categoria eliminata!</p>
-                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                         <h1>🤩&nbsp;AVVENUTO!</h1>
+                         <p>Categoria eliminata!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           } else {
                echo "<div class='avviso'>
-                  <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                  <p>Qualcosa è andato storto... Perpiacere riprova!</p>
-                  <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-               </div>";
+                    <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                    <p>Qualcosa è andato storto... Perpiacere riprova!</p>
+                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                    </div>";
           }
      }
 
      // Se è stato modificato un post
      if (isset($_GET['post_modificato'])) {
           echo "<div class='avviso'>
-               <h1>🤩&nbsp;AVVENUTO!</h1>
-               <p>Post modificato!</p>
-               <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-          </div>";
+                    <h1>🤩&nbsp;AVVENUTO!</h1>
+                    <p>Post modificato!</p>
+                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+               </div>";
      }
 
      // Se è stato eliminato un post
      if (isset($_GET['post_eliminato'])) {
           echo "<div class='avviso'>
-               <h1>🤩&nbsp;AVVENUTO!</h1>
-               <p>Post eliminato!</p>
-               <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
-          </div>";
+                    <h1>🤩&nbsp;AVVENUTO!</h1>
+                    <p>Post eliminato!</p>
+                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+               </div>";
      }
      ?>
      <!-- Sfondo sito -->
@@ -297,8 +290,7 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
                     <h2 class="pointer" id="manage_blog" style="width: 30%;">GESTISCI BLOG&ensp;<img src="../image/button_top.svg" class="up" alt="Mostra e nascondi elementi" /></h2>
                     <?php
                     // Verifica se l'utente è un admin
-                    $query_check = "SELECT * FROM users WHERE username = '$username' AND admin = 1";
-                    $check_admin = mysqli_query($conn, $query_check) or die("Connessione fallita: " . mysqli_error($conn));
+                    $check_admin = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username' AND admin = 1") or die("Connessione fallita: " . mysqli_error($conn));
 
                     // Se l'utente non è un admin mostra solo i suoi blog
                     if (mysqli_num_rows($check_admin) == 0) $query = "SELECT * FROM blog WHERE autore = '$username' OR co_autore = '$username' ORDER BY id ASC";
@@ -310,7 +302,7 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
 
                     // Se non si hanno blog
                     if (mysqli_num_rows($exec) == 0) {
-                         echo "<p id='risultati' style='width:60%; margin: 0 30% 0 1%; background:rgb(255, 255, 255, .7);'>Non hai blog al momento...😪
+                         echo "<p id='risultati' style='width:60%; margin: 0 30% 0 1%; background:rgb(255, 255, 255, .7)'>Non hai blog al momento...😪
                                    <a href='new_blog.php' style='color:#000'>Aggiungi blog</a>
                                </p>";
                     } else { ?>
@@ -353,9 +345,8 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
                                              if ($blog_co_autore != "Nessun co-autore") echo "<option>Nessun co-autore</option>";
 
                                              // Verifica che l'utente sia l'autore del post, e non il co-autore
-                                             $sql = "SELECT username FROM users WHERE username != '$blog_autore' AND username != '$blog_co_autore'";
-                                             $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                                             while ($row = mysqli_fetch_array($execution)) {
+                                             $check_auth = mysqli_query($conn, "SELECT username FROM users WHERE username != '$blog_autore' AND username != '$blog_co_autore'") or die("Connessione fallita: " . mysqli_error($conn));
+                                             while ($row = mysqli_fetch_array($check_auth)) {
                                                   echo "<option>$row[username]</option>";
                                              }
                                              echo "    </select>
@@ -377,7 +368,7 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
 								               <a href='account.php'>$blog_autore</a>";
                                              } else {
                                                   echo "<td>
-								               <a href='account.php?username=$blog_autore'>$blog_autore</a>";
+								                    <a href='account.php?username=$blog_autore'>$blog_autore</a>";
                                              }
 
                                              // Se esiste un co-autore che è anche l'utente loggato al sito
@@ -435,7 +426,7 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
 
                     $exec = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
                     if (mysqli_num_rows($exec) == 0) {
-                         echo "<p id='risultati' style='width:70%; margin: 0 30% 0 1%; background:rgb(255, 255, 255, .7);'>Non hai categorie al momento...😪
+                         echo "<p id='risultati' style='width:70%; margin: 0 30% 0 1%; background:rgb(255, 255, 255, .7)'>Non hai categorie al momento...😪
                                    <a href='new_blog.php' style='color:#000'>Aggiungi categorie</a>
                               </p>";
                     } else { ?>
@@ -526,16 +517,11 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
                </div>
 
                <?php
-               // Verifica se l'utente è un admin
-               $query_check = "SELECT * FROM users WHERE username = '$username' AND admin = 1";
-               $check_admin = mysqli_query($conn, $query_check) or die("Connessione fallita: " . mysqli_error($conn));
 
                // Se l'utente è un admin
                if (mysqli_num_rows($check_admin) > 0) {
-
                     $limit = 5;
-                    $query = "SELECT COUNT(*) FROM post";
-                    $rs_result = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+                    $rs_result = mysqli_query($conn, "SELECT COUNT(*) FROM post") or die("Connessione fallita: " . mysqli_error($conn));
                     $row = mysqli_fetch_row($rs_result);
                     $total_records = $row[0];
                     $total_pages = ceil($total_records / $limit); ?>
@@ -545,23 +531,25 @@ mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn)
                          for ($i = 1; $i <= $total_pages; $i++) {
                               if ($i == 1) {
                                    echo "<li class='active' id=$i>
-                                        <a href='pagination.php?page=$i'>$i</a><span style='color:#fff; user-select:none'>&thinsp;-&thinsp;</span>
-                                    </li>";
+                                             <a href='pagination.php?page=$i'>$i</a><span style='color:#fff; user-select:none'>&thinsp;-&thinsp;</span>
+                                        </li>";
                               } else {
                                    echo "<li id=$i>
-                                        <a href='pagination.php?page=$i'>$i</a><span style='color:#fff; user-select:none'>&thinsp;-&thinsp;</span>
-                                    </li>";
+                                             <a href='pagination.php?page=$i'>$i</a><span style='color:#fff; user-select:none'>&thinsp;-&thinsp;</span>
+                                        </li>";
                               }
                          } ?>
                     </ul>
-               <?php } ?>
+               <?php }
+               mysqli_close($conn);
+               ?>
           </div>
      </main>
 
      <img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
-	<footer>
+
+     <img src="../image/footer.svg" alt="Footer">
+     <footer>
           <a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
      </footer>
 </body>

@@ -1,9 +1,7 @@
 <?php
 session_start();
 
-if (isset($_SESSION['user_session'])) {
-     header("Location: ../index.php?no_access");
-}
+if (isset($_SESSION['user_session'])) header("Location: ../index.php?no_access");
 
 if (isset($_GET['registrazione'])) $nome_pagina = "Registrazione";
 if (isset($_GET['login'])) $nome_pagina = "Login";
@@ -296,9 +294,9 @@ if (isset($_GET['login'])) $nome_pagina = "Login";
           <?php
           endif; ?>
      </main>
-	
-	<img src="../image/footer.svg" alt="Footer"> 
-	<footer>
+
+     <img src="../image/footer.svg" alt="Footer">
+     <footer>
           <a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
      </footer>
 </body>

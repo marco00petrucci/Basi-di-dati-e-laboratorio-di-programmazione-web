@@ -4,12 +4,9 @@ require('../db_connect.php');
 
 // Verifica se l'utente è un admin ed è registrato al blog
 $username = $_SESSION['user_session'];
-$query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
-$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+$check_admin = mysqli_query($conn, "SELECT admin FROM users WHERE username = '$username' AND admin = 1") or die("Connessione fallita: " . mysqli_error($conn));
 
-if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
-	header("Location: ../index.php?no_access");
-}
+if (!isset($_SESSION['user_session']) || (mysqli_num_rows($check_admin) == 0)) header("Location: ../index.php?no_access");
 ?>
 
 <!DOCTYPE html>
@@ -46,9 +43,8 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 	<?php
 	// Se si sceglie di approvare un commento
 	if (isset($_GET['Approve_ID'])) {
-		$sql = "UPDATE commenti SET stato = 1, approved_by = '$_SESSION[user_session]' WHERE id_c = '$_GET[Approve_ID]'";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($execution) {
+		$approva_comm = mysqli_query($conn, "UPDATE commenti SET stato = 1, approved_by = '$_SESSION[user_session]' WHERE id_c = '$_GET[Approve_ID]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($approva_comm) {
 			echo "<div class='avviso'>
 					<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
 					<p>Commento approvato!</p>
@@ -65,9 +61,8 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 
 	// Se si sceglie di disapprovare un commento
 	if (isset($_GET['Unapprove_ID'])) {
-		$sql = "UPDATE commenti SET stato = 0, approved_by = '$_SESSION[user_session]' WHERE id_c = '$_GET[Unapprove_ID]'";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($execution) {
+		$disappr_comm = mysqli_query($conn, "UPDATE commenti SET stato = 0, approved_by = '$_SESSION[user_session]' WHERE id_c = '$_GET[Unapprove_ID]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($disappr_comm) {
 			echo "<div class='avviso'>
 					<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
 					<p>Commento non approvato!</p>
@@ -171,9 +166,8 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 		<!-- Commenti APPROVATI dagli amministratori -->
 		<h2 class="pointer">Commenti approvati&ensp;<img src="../image/button_top.svg" class="down" alt="Mostra e nascondi elementi" /></h2>
 		<?php
-		$sql = "SELECT * FROM commenti AS c, post AS p WHERE c.stato = 1 AND p.id = c.id_post AND c.approved_by IS NOT NULL AND c.commento IS NOT NULL ORDER BY c.data_c";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if (mysqli_num_rows($execution) > 0) :
+		$comm_appr = mysqli_query($conn, "SELECT * FROM commenti AS c, post AS p WHERE c.stato = 1 AND p.id = c.id_post AND c.approved_by IS NOT NULL AND c.commento IS NOT NULL ORDER BY c.data_c") or die("Connessione fallita: " . mysqli_error($conn));
+		if (mysqli_num_rows($comm_appr) > 0) {
 			$postNo = 1; ?>
 			<table>
 				<thead>
@@ -190,7 +184,7 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 
 				<tbody>
 					<?php
-					while ($result = mysqli_fetch_assoc($execution)) {
+					while ($result = mysqli_fetch_assoc($comm_appr)) {
 						$id_c = $result['id_c'];
 						$data_c = $result['data_c'];
 						$username = $result['username'];
@@ -205,38 +199,38 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 						// Se l'autore del commento è l'utente loggato al sito
 						if ($username == $_SESSION['user_session']) {
 							echo "<td>
-                              			<a href='account.php'>$username</a>
-                         			</td>";
+									<a href='account.php'>$username</a>
+                         		 </td>";
 						}
 						// Se l'autore del commento NON è l'utente loggato al sito
 						else {
 							echo "<td>
-                              			<a href='account.php?username=$username'>$username</a>
-                         			</td>";
+                              		<a href='account.php?username=$username'>$username</a>
+                         		</td>";
 						}
 
 						echo "<td>$commento</td>
-							<td>
-								<a href='../single.php?id=$id_post'>$titolo_post</a>
-							</td>";
+							  <td>
+							  	  <a href='../single.php?id=$id_post'>$titolo_post</a>
+							  </td>";
 
 						// Se l'utente che ha approvato il commento è l'utente loggato al sito
 						if ($approved_by == $_SESSION['user_session']) {
 							echo "<td>
-                              			<a href='account.php'>$approved_by</a>
-                         			</td>";
+                              		<a href='account.php'>$approved_by</a>
+                         		 </td>";
 						}
 						// Se l'utente che ha approvato il commento NON è l'utente loggato al sito
 						else {
 							echo "<td>
-                              			<a href='account.php?username=$approved_by'>$approved_by</a>
-                         			</td>";
+                              		 <a href='account.php?username=$approved_by'>$approved_by</a>
+                         		 </td>";
 						}
 
 						echo "<td style='width:5%; text-align:center'>
 								<a href='commenti.php?Unapprove_ID=$id_c'>
 									<img class='icona statica unapprove' src='../image/meno.png' alt='Non approvare commento' title='Non approvare commento'>
-                                   		<img class='icona attiva unapprove' src='../image/meno.gif' alt='Non approvare commento' title='Non approvare commento'>
+                                   	<img class='icona attiva unapprove' src='../image/meno.gif' alt='Non approvare commento' title='Non approvare commento'>
 								</a>
 							</td>
 						</tr>";
@@ -245,16 +239,15 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</tbody>
 			</table>
 		<?php
+		}
 		// Se non ci sono commenti approvati
-		else : echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Nessun commento è stato approvato.</h3>";
-		endif; ?>
+		else echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Nessun commento è stato approvato.</h3>"; ?>
 
 		<!-- Commenti NON APPROVATI dagli amministratori -->
 		<h2 class="pointer">Commenti non approvati&ensp;<img src="../image/button_top.svg" class="down" alt="Mostra e nascondi elementi" /></h2>
 		<?php
-		$sql = "SELECT * FROM commenti as c, post as p WHERE c.stato = 0 AND p.id = c.id_post AND c.approved_by IS NOT NULL AND c.commento IS NOT NULL ORDER BY data_c";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if (mysqli_num_rows($execution) > 0) :
+		$comm_disappr = mysqli_query($conn, "SELECT * FROM commenti as c, post as p WHERE c.stato = 0 AND p.id = c.id_post AND c.approved_by IS NOT NULL AND c.commento IS NOT NULL ORDER BY data_c") or die("Connessione fallita: " . mysqli_error($conn));
+		if (mysqli_num_rows($comm_disappr) > 0) {
 			$postNo = 1; ?>
 			<table>
 				<thead>
@@ -270,7 +263,7 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</thead>
 				<tbody>
 					<?php
-					while ($result = mysqli_fetch_assoc($execution)) {
+					while ($result = mysqli_fetch_assoc($comm_disappr)) {
 						$id_c = $result['id_c'];
 						$data_c = $result['data_c'];
 						$username = $result['username'];
@@ -285,14 +278,14 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 						// Se l'autore del commento è l'utente loggato al sito
 						if ($username == $_SESSION['user_session']) {
 							echo "<td>
-                              			<a href='account.php'>$username</a>
-                         			</td>";
+									<a href='account.php'>$username</a>
+                         		 </td>";
 						}
 						// Se l'autore del commento NON è l'utente loggato al sito
 						else {
 							echo "<td>
-                              			<a href='account.php?username=$username'>$username</a>
-                         			</td>";
+                              		<a href='account.php?username=$username'>$username</a>
+                         		 </td>";
 						}
 
 						echo "<td>$commento</td>
@@ -314,7 +307,7 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 						echo "<td style='width:5%; text-align:center'>
 								<a href='commenti.php?Approve_ID=$id_c'>
 									<img class='icona statica approva' src='../image/plus.png' alt='Approvare commento' title='Approvare commento'>
-                                   		<img class='icona attiva approva' src='../image/plus.gif' alt='Approvare commento' title='Approvare commento'>
+                                   	<img class='icona attiva approva' src='../image/plus.gif' alt='Approvare commento' title='Approvare commento'>
 								</a>
 							</td>
 						</tr>";
@@ -323,16 +316,15 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</tbody>
 			</table>
 		<?php
+		}
 		// Se non ci sono commenti approvati
-		else : echo "<h3 style='background:rgb(255,255,255,.7); width:20%; margin-left:2%; padding-left: 1%; border-radius:20px'>Nessun commento non è stato approvato.</h3>";
-		endif; ?>
+		else echo "<h3 style='background:rgb(255,255,255,.7); width:20%; margin-left:2%; padding-left: 1%; border-radius:20px'>Nessun commento non è stato approvato.</h3>"; ?>
 
 		<!-- Commenti da visionare -->
 		<h2 class="pointer">Commenti da visionare&ensp;<img src="../image/button_top.svg" class="down" alt="Mostra e nascondi elementi" /></h2>
 		<?php
-		$sql = "SELECT * FROM commenti AS c, post AS p WHERE c.stato = 1 AND p.id = c.id_post AND c.approved_by IS NULL AND c.commento IS NOT NULL ORDER BY c.data_c";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if (mysqli_num_rows($execution) > 0) :
+		$visiona_comm = mysqli_query($conn, "SELECT * FROM commenti AS c, post AS p WHERE c.stato = 1 AND p.id = c.id_post AND c.approved_by IS NULL AND c.commento IS NOT NULL ORDER BY c.data_c") or die("Connessione fallita: " . mysqli_error($conn));
+		if (mysqli_num_rows($visiona_comm) > 0) {
 			$postNo = 1; ?>
 			<table>
 				<thead>
@@ -347,7 +339,7 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</thead>
 				<tbody>
 					<?php
-					while ($result = mysqli_fetch_assoc($execution)) {
+					while ($result = mysqli_fetch_assoc($visiona_comm)) {
 						$id_c = $result['id_c'];
 						$data_c = $result['data_c'];
 						$username = $result['username'];
@@ -375,11 +367,11 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 						<td style='width:6%; text-align:center'>
 							<a href='commenti.php?Unapprove_ID=$id_c'>
 								<img class='icona statica unapprove' src='../image/meno.png' alt='Non approvare commento' title='Non approvare commento'>
-                              		<img class='icona attiva unapprove' src='../image/meno.gif' alt='Non approvare commento' title='Non approvare commento'>
+                              	<img class='icona attiva unapprove' src='../image/meno.gif' alt='Non approvare commento' title='Non approvare commento'>
 							</a>
 							<a href='commenti.php?Approve_ID=$id_c'>
 								<img class='icona statica approva' src='../image/plus.png' alt='Approvare commento' title='Approvare commento'>
-                              		<img class='icona attiva approva' src='../image/plus.gif' alt='Approvare commento' title='Approvare commento'>
+                              	<img class='icona attiva approva' src='../image/plus.gif' alt='Approvare commento' title='Approvare commento'>
 							</a>
 						</td>
 					</tr>";
@@ -388,14 +380,15 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</tbody>
 			</table>
 		<?php
+		}
 		// Se non ci sono commenti da visionare
-		else : echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Non ci sono commenti da visionare.</h3>";
-		endif; ?>
+		else echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Non ci sono commenti da visionare.</h3>";
+		mysqli_close($conn); ?>
 	</main>
 
 	<img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
+
+	<img src="../image/footer.svg" alt="Footer">
 	<footer>
 		<a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>

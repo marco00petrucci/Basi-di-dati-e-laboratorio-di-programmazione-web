@@ -5,9 +5,8 @@ require('../db_connect.php');
 if ((!isset($_SESSION['user_session'])) && (!isset($_GET['username']))) header("Location: ../index.php?no_access");
 
 if (isset($_GET['username'])) {
-     $query = "SELECT username FROM users WHERE username = '$_GET[username]'";
-     $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-     if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?404");
+     $get_user = mysqli_query($conn, "SELECT username FROM users WHERE username = '$_GET[username]'") or die("Connessione fallita: " . mysqli_error($conn));
+     if (mysqli_num_rows($get_user) == 0) header("Location: ../index.php?404");
 }
 ?>
 
@@ -129,7 +128,7 @@ if (isset($_GET['username'])) {
                               else if (risposta == "Email già esistente") $("#error").fadeIn(400).html('<img src="../image/warning.svg" alt="Warning" width="20px" height="20px" >&nbsp;Spiacenti, email già utilizzata! 😯');
 
                               // Se sono stati inseriti caratteri tipici della SQL Injection
-                              else if (risposta == "Dati corrotti") $("#error").fadeIn(400).html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;No dati corrotti su questo sito... 👨🏼‍💻');
+                              else if (risposta == "Dati corrotti") $("#error").fadeIn(400).html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;No dati corrotti su questo sito...');
 
                               // Se qualcosa è andato storto
                               else $("#error").fadeIn(400).html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;Qualcosa è andato storto! 😓');
@@ -152,7 +151,6 @@ if (isset($_GET['username'])) {
 
 <body id="account">
      <?php
-
      if (isset($_GET['disiscrizione']) && $_GET['disiscrizione'] == "error") {
           echo "<div class='avviso'>
                     <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
@@ -261,7 +259,7 @@ if (isset($_GET['username'])) {
                <?php
 
                // Se non viene scelto di modificare l'account
-               if (!isset($_GET['modifica'])) :
+               if (!isset($_GET['modifica'])) {
 
                     // Se si cerca un altro account
                     if (isset($_GET['username'])) $username = $_GET['username'];
@@ -269,8 +267,7 @@ if (isset($_GET['username'])) {
                     // Se non si cerca un altro account, visualizza i dati dell'account attivo nella sessione
                     else $username = $_SESSION['user_session'];
 
-                    $query = "SELECT *, DATE_FORMAT(add_data, '- membro dal %d %M %Y') AS niceDate FROM users WHERE username = '$username'";
-                    $user_query = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+                    $user_query = mysqli_query($conn, "SELECT *, DATE_FORMAT(add_data, '- membro dal %d %M %Y') AS niceDate FROM users WHERE username = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
                     $row = mysqli_fetch_array($user_query);
                     $imageURL_selected = '../image/' . $row['avatar'];
 
@@ -296,7 +293,7 @@ if (isset($_GET['username'])) {
                     else echo '<p>Telefono: <a href="tel:' . $row['telefono'] . '">' . $row['telefono'] . '</a></p>';
 
                     // Se non viene cercato nessun account che non sia quello attivo nella sessione
-                    if (isset($_SESSION['user_session']) && $row['username'] == $_SESSION['user_session']) : ?>
+                    if (isset($_SESSION['user_session']) && $row['username'] == $_SESSION['user_session']) { ?>
                          <a href="account.php?modifica">
                               <button type="submit" class="button_form" id="edit_profile" name="edit_profile">
                                    <img src="../image/user.png" class="button_icon" alt="Icona modifica account">&ensp;Modifica i dati
@@ -305,8 +302,7 @@ if (isset($_GET['username'])) {
                          <?php
 
                          // Verifica che, se si vuole eliminare l'account, non si abbiano blog o post
-                         $sql = "SELECT * FROM blog AS b, post AS p WHERE b.autore = '$_SESSION[user_session]' OR b.co_autore = '$_SESSION[user_session]' OR p.autore = '$_SESSION[user_session]'";
-                         $autore_query = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                         $autore_query = mysqli_query($conn, "SELECT * FROM blog AS b, post AS p WHERE b.autore = '$_SESSION[user_session]' OR b.co_autore = '$_SESSION[user_session]' OR p.autore = '$_SESSION[user_session]'") or die("Connessione fallita: " . mysqli_error($conn));
                          if (mysqli_num_rows($autore_query) > 0) {
                               $autore_row = mysqli_fetch_array($autore_query);
                          ?>
@@ -324,8 +320,8 @@ if (isset($_GET['username'])) {
                               </a>
                     <?php
                          }
-                    endif;
-               else : ?>
+                    }
+               } else { ?>
                     <!-- Se si sceglie di modificare l'account -->
 
                     <form id="avatar_form" method="post" enctype="multipart/form-data">
@@ -364,15 +360,9 @@ if (isset($_GET['username'])) {
                                                             $('#avatar_form').delay(1775).fadeOut();
                                                             setTimeout(function(){location.href='account.php'} , 2000);
                                                        </script>";
-                                             } else {
-                                                  echo "Caricamento dell'avatar fallito, Per favore riprova 🤞";
-                                             }
-                                        } else {
-                                             echo "Spiacenti, il tuo avatar supera 1MB.";
-                                        }
-                                   } else {
-                                        echo 'Spiacenti, sono supportate solo le immagini di tipo JPG, JPEG, PNG, GIF. 📸';
-                                   }
+                                             } else echo "Caricamento dell'avatar fallito, Per favore riprova 🤞";
+                                        } else echo "Spiacenti, il tuo avatar supera 1MB.";
+                                   } else echo 'Spiacenti, sono supportate solo le immagini di tipo JPG, JPEG, PNG, GIF. 📸';
                               }
                               ?>
                          </p>
@@ -387,8 +377,7 @@ if (isset($_GET['username'])) {
                          <?php
                          // Visualizza i dati dell'account attivo nella sessione da modificare
                          $username = $_SESSION['user_session'];
-                         $query = "SELECT * FROM users WHERE username = '$username'";
-                         $user_query = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+                         $user_query = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
                          $row = mysqli_fetch_array($user_query);
                          // Nome
                          echo '<label for="Mnome">Nome:</label>
@@ -409,7 +398,7 @@ if (isset($_GET['username'])) {
 
                          // Password
                          echo '<label for="Mpassword">Password:</label>
-                                   <input type="password" class="edit_box" name="Mpassword" id="Mpassword" value="' . $row['password'] . '"></input><br>';
+                                   <input type="password" class="edit_box" name="Mpassword" id="Mpassword" value=""></input><br>';
 
                          // Conferma password
                          echo '<div id="conferma_pass" style="display:none">
@@ -429,17 +418,16 @@ if (isset($_GET['username'])) {
                          </a>
                     </form>
                <?php
-               endif; ?>
+               } ?>
           </div>
 
           <h2>BLOG DELL'UTENTE</h2>
           <?php
           if (!isset($_GET['username'])) $user_username = $username;
           else $user_username = $_GET['username'];
-          $sql = "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog WHERE autore = '$user_username' OR co_autore = '$user_username' ORDER BY nome_blog ASC";
-          $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-          if (mysqli_num_rows($execution) > 0) {
-               while ($result = mysqli_fetch_assoc($execution)) {
+          $load_post = mysqli_query($conn, "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog WHERE autore = '$user_username' OR co_autore = '$user_username' ORDER BY nome_blog ASC") or die("Connessione fallita: " . mysqli_error($conn));
+          if (mysqli_num_rows($load_post) > 0) {
+               while ($result = mysqli_fetch_assoc($load_post)) {
                     $blog_immagine = $result['immagine'];
                     $blog_nome = $result['nome_blog'];
                     $blog_autore = $result['autore'];
@@ -494,18 +482,15 @@ if (isset($_GET['username'])) {
           <aside>
                <!-- Blog -->
                <div id="blog">
-                    <h4><a href="../blog.php">Blog</a></h4>
+                    <h4><a href="blog.php">Blog</a></h4>
                     <ul>
                          <?php
-                         $sql = "SELECT * FROM blog ORDER BY creato_il DESC LIMIT 10";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($recent = mysqli_fetch_assoc($execution)) {
-                              $blog = $recent['nome_blog'];
+                         $find_blog = mysqli_query($conn, "SELECT nome_blog FROM blog ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($nome_blog = mysqli_fetch_assoc($find_blog)) {
                               echo "<li>
-                                        <a href='../blog.php?testoCerca=$blog'>$blog</a>
+                                        <a href='../blog.php?testoCerca=$nome_blog[nome_blog]'>$nome_blog[nome_blog]</a>
                                    </li>";
-                         }
-                         ?>
+                         } ?>
                     </ul>
                </div>
 
@@ -514,12 +499,11 @@ if (isset($_GET['username'])) {
                     <h4>Categorie</h4>
                     <ul>
                          <?php
-                         $sql = "SELECT DISTINCT categoria FROM post";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($categoria = mysqli_fetch_assoc($execution)) {
+                         $find_cat = mysqli_query($conn, "SELECT DISTINCT categoria FROM post LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($categoria = mysqli_fetch_assoc($find_cat)) {
                               echo "<li>
-                                		<a href='../blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
-                              	</li>";
+                                        <a href='../blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
+                                   </li>";
                          }
                          ?>
                     </ul>
@@ -530,15 +514,12 @@ if (isset($_GET['username'])) {
                     <h4>Post recenti</h4>
                     <ul>
                          <?php
-                         $sql = "SELECT * FROM post ORDER BY creato_il DESC LIMIT 10";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($recent = mysqli_fetch_assoc($execution)) {
-                              $id = $recent['id'];
+                         $find_post = mysqli_query($conn, "SELECT id, titolo FROM post ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($post = mysqli_fetch_assoc($find_post)) {
                               echo "<li>
-                                        <a href='../single.php?id=$id'>$recent[titolo]</a>
+                                        <a href='../single.php?id=$post[id]'>$post[titolo]</a>
                                    </li>";
-                         }
-                         ?>
+                         } ?>
                     </ul>
                </div>
 
@@ -548,35 +529,32 @@ if (isset($_GET['username'])) {
                     <ul>
                          <?php
                          // Cerca gli utenti registrati nel database
-                         $sql = "SELECT * FROM users ORDER BY add_data ASC LIMIT 10";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                         $execution = mysqli_query($conn, "SELECT username, avatar FROM users ORDER BY add_data ASC LIMIT 5") or die("Connessione fallita: " . mysqli_error($conn));
                          while ($utenti_registrati = mysqli_fetch_assoc($execution)) {
                               $username = $utenti_registrati['username'];
                               $imageURL = '../image/' . $utenti_registrati["avatar"];
 
-
                               // Conta quanti blog hanno gli utenti registrati
-                              $numero_blog = "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'";
-                              $count_execution = mysqli_query($conn, $numero_blog) or die("Connessione fallita: " . mysqli_error($conn));
-                              $row = mysqli_fetch_array($count_execution);
-                              $count = $row['count_blog'] . " blog";
+                              $count_blog = mysqli_query($conn, "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+                              $count = mysqli_fetch_array($count_blog)['count_blog'] . " blog";
                               if ($count == "0 blog") $count = "Nessun blog";
 
                               if (isset($_SESSION['user_session']) && $username == $_SESSION['user_session']) {
                                    echo "<li id='per_utenti'>
-                                             <a href='account.php'>
-                                             <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
+                                             <a href='reg-login/account.php'>
+                                                  <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
                                              </a>- $count
-                                        </li>";
+                                         </li>";
                               } else {
                                    // Stampa risultato
                                    echo "<li id='per_utenti'>
-                                             <a href='account.php?username=$username'>
-                                             <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
+                                             <a href='reg-login/account.php?username=$username'>
+                                                  <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
                                              </a>- $count
                                         </li>";
                               }
                          }
+                         mysqli_close($conn);
                          ?>
                     </ul>
                </div>
@@ -584,9 +562,9 @@ if (isset($_GET['username'])) {
      </main>
 
      <img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
-	<footer>
+
+     <img src="../image/footer.svg" alt="Footer">
+     <footer>
           <a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
      </footer>
 </body>

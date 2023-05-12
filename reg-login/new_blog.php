@@ -2,17 +2,14 @@
 session_start();
 require('../db_connect.php');
 
-// Verifica se l'utente è un admin
-if (!isset($_SESSION['user_session'])) {
-     header("Location: ../index.php?no_access");
-}
+// Solo gli utenti registrati possono vedere la pagina
+if (!isset($_SESSION['user_session'])) header("Location: ../index.php?no_access");
+
+// Verifica se l'utente è proprietario del post
 if (isset($_GET['aggiungi_post'])) {
      $username = $_SESSION['user_session'];
-     $query = "SELECT * FROM users AS u, blog AS b WHERE (u.username = '$username' AND u.admin = 1) OR ('$_GET[aggiungi_post]' = b.nome_blog AND b.autore = '$username' OR b.co_autore = '$username')";
-     $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-     if (mysqli_num_rows($execution) == 0) {
-          header("Location: ../index.php?no_access");
-     }
+     $execution = mysqli_query($conn, "SELECT * FROM users AS u, blog AS b WHERE '$_GET[aggiungi_post]' = b.nome_blog AND (b.autore = '$username' OR b.co_autore = '$username')") or die("Connessione fallita: " . mysqli_error($conn));
+     if (mysqli_num_rows($execution) == 0) header("Location: ../index.php?no_access");
 }
 ?>
 
@@ -26,7 +23,7 @@ if (isset($_GET['aggiungi_post'])) {
      <title>Bloggy | Aggiungi
           <?php
           if (!isset($_GET['aggiungi_post'])) echo "blog";
-          else echo "post"; ?></title>
+          else echo "post" ?></title>
      <style>
           @import url("../index.css");
           @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
@@ -258,7 +255,7 @@ if (isset($_GET['aggiungi_post'])) {
                     <h3>NUOVO BLOG</h3>
                     <label for="nome_blog">Nome blog</label><br>
                     <input type="text" class="input_box" name="nome_blog" id="nome_blog" placeholder="Aggiungi un nome al blog">
-                    <div id='blog_already_exists' name='blog_already_exists' style="display: none;"></div><br><br>
+                    <div id='blog_already_exists' name='blog_already_exists' style="display: none"></div><br><br>
 
                     <label for="immagine_blog">Inserisci immagine</label><br>
                     <img id='immagine_blog' alt='Immagine blog' /><br class="spazio_input" style="display:none">
@@ -269,9 +266,8 @@ if (isset($_GET['aggiungi_post'])) {
                          <option selected='selected'>Nessun co-autore</option>
                          <?php
                          // Verifica che l'utente sia l'autore del post, e non il co-autore
-                         $sql = "SELECT username FROM users WHERE username != '$username'";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($row = mysqli_fetch_array($execution)) {
+                         $check_auth = mysqli_query($conn, "SELECT username FROM users WHERE username != '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($row = mysqli_fetch_array($check_auth)) {
                               echo "<option>$row[username]</option>";
                          }
                          ?>
@@ -283,7 +279,7 @@ if (isset($_GET['aggiungi_post'])) {
 
                     <label for="add_categoria">Aggiungi categoria</label><br>
                     <input type="text" class="input_box" name="add_categoria" id="add_categoria" placeholder="Nome categoria">
-                    <div id='cat_already_exists' style="display: none;"></div><br><br>
+                    <div id='cat_already_exists' style="display: none"></div><br><br>
 
                     <label for="immagine_post">Inserisci immagine</label><br>
                     <img id='immagine_post' alt='Immagine post' /><br class="spazio_input" style="display:none">
@@ -305,13 +301,13 @@ if (isset($_GET['aggiungi_post'])) {
 
                     <label for="add_categoria">Categoria</label><br>
                     <input type="text" class="input_box" name="add_categoria" id="add_categoria" placeholder="Nome categoria">
-                    <div id='cat_already_exists' style="display: none;"></div><br><br>
+                    <div id='cat_already_exists' style="display: none"></div><br><br>
 
                     <label for="titolo">Titolo</label><br>
                     <input type="text" class="input_box" name="titolo" id="postname" placeholder="Aggiungi un titolo"><br><br>
 
                     <label for="immagine_nuovo_post">Inserisci immagine</label><br>
-                    <img id='immagine_nuovo_post' alt='Immagine post' name="immagine_post" /><br class="spazio_input" style="display: none;">
+                    <img id='immagine_nuovo_post' alt='Immagine post' name="immagine_post" /><br class="spazio_input" style="display: none">
                     <input type="file" name="immagine_nuovo_post" id="postfile" onchange="$('#immagine_nuovo_post, .spazio_input').css('display','initial'); $('#immagine_nuovo_post').attr('src', window.URL.createObjectURL(this.files[0]))"><br><br>
 
                     <label for="contenuto">Contenuto</label><br>
@@ -325,18 +321,15 @@ if (isset($_GET['aggiungi_post'])) {
           <aside>
                <!-- Blog -->
                <div id="blog">
-                    <h4><a href="../blog.php">Blog</a></h4>
+                    <h4><a href="blog.php">Blog</a></h4>
                     <ul>
                          <?php
-                         $sql = "SELECT * FROM blog ORDER BY creato_il DESC LIMIT 10";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($recent = mysqli_fetch_assoc($execution)) {
-                              $blog = $recent['nome_blog'];
+                         $find_blog = mysqli_query($conn, "SELECT nome_blog FROM blog ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($nome_blog = mysqli_fetch_assoc($find_blog)) {
                               echo "<li>
-                                        <a href='../blog.php?testoCerca=$blog'>$blog</a>
+                                        <a href='../blog.php?testoCerca=$nome_blog[nome_blog]'>$nome_blog[nome_blog]</a>
                                    </li>";
-                         }
-                         ?>
+                         } ?>
                     </ul>
                </div>
 
@@ -345,12 +338,11 @@ if (isset($_GET['aggiungi_post'])) {
                     <h4>Categorie</h4>
                     <ul>
                          <?php
-                         $sql = "SELECT DISTINCT categoria FROM post";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($categoria = mysqli_fetch_assoc($execution)) {
+                         $find_cat = mysqli_query($conn, "SELECT DISTINCT categoria FROM post LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($categoria = mysqli_fetch_assoc($find_cat)) {
                               echo "<li>
-                                		<a href='../blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
-                              	</li>";
+                                        <a href='../blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
+                                   </li>";
                          }
                          ?>
                     </ul>
@@ -361,15 +353,12 @@ if (isset($_GET['aggiungi_post'])) {
                     <h4>Post recenti</h4>
                     <ul>
                          <?php
-                         $sql = "SELECT * FROM post ORDER BY creato_il DESC LIMIT 10";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-                         while ($recent = mysqli_fetch_assoc($execution)) {
-                              $id = $recent['id'];
+                         $find_post = mysqli_query($conn, "SELECT id, titolo FROM post ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($post = mysqli_fetch_assoc($find_post)) {
                               echo "<li>
-                                        <a href='../single.php?id=$id'>$recent[titolo]</a>
+                                        <a href='../single.php?id=$post[id]'>$post[titolo]</a>
                                    </li>";
-                         }
-                         ?>
+                         } ?>
                     </ul>
                </div>
 
@@ -379,35 +368,32 @@ if (isset($_GET['aggiungi_post'])) {
                     <ul>
                          <?php
                          // Cerca gli utenti registrati nel database
-                         $sql = "SELECT * FROM users ORDER BY add_data ASC LIMIT 10";
-                         $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+                         $execution = mysqli_query($conn, "SELECT username, avatar FROM users ORDER BY add_data ASC LIMIT 5") or die("Connessione fallita: " . mysqli_error($conn));
                          while ($utenti_registrati = mysqli_fetch_assoc($execution)) {
                               $username = $utenti_registrati['username'];
                               $imageURL = '../image/' . $utenti_registrati["avatar"];
 
-
                               // Conta quanti blog hanno gli utenti registrati
-                              $numero_blog = "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'";
-                              $count_execution = mysqli_query($conn, $numero_blog) or die("Connessione fallita: " . mysqli_error($conn));
-                              $row = mysqli_fetch_array($count_execution);
-                              $count = $row['count_blog'] . " blog";
+                              $count_blog = mysqli_query($conn, "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+                              $count = mysqli_fetch_array($count_blog)['count_blog'] . " blog";
                               if ($count == "0 blog") $count = "Nessun blog";
 
                               if (isset($_SESSION['user_session']) && $username == $_SESSION['user_session']) {
                                    echo "<li id='per_utenti'>
-                                             <a href='account.php'>
-                                             <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
+                                             <a href='reg-login/account.php'>
+                                                  <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
                                              </a>- $count
-                                        </li>";
+                                         </li>";
                               } else {
                                    // Stampa risultato
                                    echo "<li id='per_utenti'>
-                                             <a href='account.php?username=$username'>
-                                             <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
+                                             <a href='reg-login/account.php?username=$username'>
+                                                  <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
                                              </a>- $count
                                         </li>";
                               }
                          }
+                         mysqli_close($conn);
                          ?>
                     </ul>
                </div>
@@ -416,11 +402,10 @@ if (isset($_GET['aggiungi_post'])) {
 
      <?php
      date_default_timezone_set('Europe/Rome');
-     $time = time();
+     $dateTime = date('Y-m-d H:i:s');
      $vietate = array("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "<script>");
 
      if (isset($_POST['aggiungi_blog_post'])) {
-          $dateTime = strftime('%Y-%m-%d %H:%M:%S', $time);
           $nome_blog = mysqli_real_escape_string($conn, $_POST['nome_blog']);
           $autore = $_SESSION['user_session'];
           $co_autore = mysqli_real_escape_string($conn, $_POST['co_autore']);
@@ -466,23 +451,17 @@ if (isset($_GET['aggiungi_post'])) {
                $query .= "INSERT INTO post (creato_il, nome_b, categoria, titolo, autore, contenuto, immagine) VALUES ('$dateTime', '$nome_blog', '$nome_categoria', '$titolo', '$autore', '$contenuto', '$immagine_post');";
 
                $execution = mysqli_multi_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-
-               if ($execution) {
-                    move_uploaded_file($_FILES['immagine_blog']['name'], $image_blog_directory);
-                    move_uploaded_file($_FILES['immagine_post']['name'], $image_post_directory);
-                    echo "<script>window.location.href = '../index.php?aggiungi_blog_post';</script>";
-               }
+               if ($execution && move_uploaded_file($_FILES['immagine_blog']['tmp_name'], $image_blog_directory) && move_uploaded_file($_FILES['immagine_post']['tmp_name'], $image_post_directory)) echo "<script>window.location.href = '../index.php?aggiungi_blog_post';</script>";
           } else {
                echo "<div class='avviso'>
                          <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                         <p>Sono stati inseriti dati corrotti! 😣</p>
+                         <p>Sono stati inseriti dati corrotti.</p>
                          <script>setTimeout(\"window.location.href = 'new_blog.php'\", 2500);</script>
                     </div>";
           }
      }
 
      if (isset($_POST['new_post_submit'])) {
-          $dateTime = strftime('%Y-%m-%d %H:%M:%S', $time);
           $blog_da_modificare = mysqli_real_escape_string($conn, $_POST['blog_da_modificare']);
           $add_categoria = mysqli_real_escape_string($conn, $_POST['add_categoria']);
           $titolo = mysqli_real_escape_string($conn, $_POST['titolo']);
@@ -517,16 +496,18 @@ if (isset($_GET['aggiungi_post'])) {
           } else {
                echo "<div class='avviso'>
                          <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                         <p>Sono stati inseriti dati corrotti! 😣</p>
+                         <p>Sono stati inseriti dati corrotti.</p>
                          <script>setTimeout(\"window.location.href = 'new_blog.php?aggiungi_post=$_POST[blog_da_modificare]'\", 2500);</script>
                     </div>";
           }
-     } ?>
+     }
+     mysqli_close($conn);
+     ?>
 
      <img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
-	<footer>
+
+     <img src="../image/footer.svg" alt="Footer">
+     <footer>
           <a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
      </footer>
 

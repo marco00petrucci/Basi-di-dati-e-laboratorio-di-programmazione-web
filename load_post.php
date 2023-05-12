@@ -37,5 +37,5 @@ if (isset($_POST["start"])) {
             </div>";
         }
     }
-}
-?>
+    mysqli_close($conn);
+} ?>

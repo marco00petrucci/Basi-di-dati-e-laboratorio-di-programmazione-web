@@ -3,10 +3,10 @@ session_start();
 require('../db_connect.php');
 
 date_default_timezone_set('Europe/Rome');
-$data = strftime('%Y-%m-%d %H:%M:%S ', time());
+$data = date('Y-m-d H:i:s');
 $vietate = array("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "<script>");
 
-//Invia il messaggio
+// Invia il messaggio
 if (isset($_POST['cont_invia'])) {
      $nome = mysqli_real_escape_string($conn, $_POST['Anome']);
      $email = mysqli_real_escape_string($conn, $_POST['Aemail']);
@@ -37,8 +37,7 @@ if (isset($_POST['cont_invia'])) {
 
      // Se non sono stati inseriti caratteri tipici della SQL Injection
      if ($nome_ok && $email_ok && $telefono_ok && $messaggio_ok) {
-          $query = "INSERT INTO messaggi (data_m, nome, email, telefono, messaggio) VALUES ('$data', '$nome', '$email', '$telefono', '$messaggio')";
-          $mex_execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+          $mex_execution = mysqli_query($conn, "INSERT INTO messaggi (data_m, nome, email, telefono, messaggio) VALUES ('$data', '$nome', '$email', '$telefono', '$messaggio')") or die("Connessione fallita: " . mysqli_error($conn));
           if ($mex_execution) echo "Messaggio inviato";
      } else echo "Dati corrotti";
 }
@@ -94,7 +93,8 @@ if (isset($_POST['reg_btn'])) {
 
           // Se non sono stati inseriti caratteri tipici della SQL Injection
           if ($nome_ok && $cognome_ok && $username_ok && $email_ok && $password_ok) {
-               $query = "INSERT INTO users (add_data, username, nome, cognome, email, password) VALUES ('$data', '$username', '$nome', '$cognome', '$email', '$password')";
+               $crypt_password = password_hash($password, PASSWORD_DEFAULT);
+               $query = "INSERT INTO users (add_data, username, nome, cognome, email, password) VALUES ('$data', '$username', '$nome', '$cognome', '$email', '$crypt_password')";
                $reg_exec = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
                if ($reg_exec) {
                     $_SESSION['user_session'] = $username;
@@ -111,6 +111,7 @@ if (isset($_POST['login_btn'])) {
      $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
      $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
      $result = mysqli_fetch_assoc($execution);
+     $password = password_verify($result['password'], $password);
      if ($result['password'] == $password) {
           echo "Login effettuato";
           $_SESSION['user_session'] = $username;
@@ -135,7 +136,6 @@ if (isset($_POST['modifica_btn'])) {
 
      // Se la email non è già stata presa
      else {
-
           $nome_ok = true;
           for ($k = 0; $k <= 6 && $nome_ok; $k++) {
                if (stripos($nome, $vietate[$k]) !== false) $nome_ok = false;
@@ -172,7 +172,7 @@ if (isset($_POST['modifica_btn'])) {
 
           // Se non sono stati inseriti caratteri tipici della SQL Injection
           if ($nome_ok && $cognome_ok && $telefono_ok && $email_ok && $epassword_ok && $ecpassword_ok) {
-               if(empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
+               if (empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
                else $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = '$telefono', email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
                $edit_exec = mysqli_query($conn, $Uquery) or die("Connessione fallita: " . mysqli_error($conn));
                if ($edit_exec) echo "Modificato";
@@ -182,18 +182,15 @@ if (isset($_POST['modifica_btn'])) {
 
 if (isset($_GET['blog'])) {
      // Verifica se il nome del blog è già stato preso
-     $nome_b_query = "SELECT nome_blog FROM blog WHERE nome_blog = '$_GET[blog]'";
-     $nome_b_exec = mysqli_query($conn, $nome_b_query) or die("Connessione fallita: " . mysqli_error($conn));
-
-     if (mysqli_num_rows($nome_b_exec) > 0) echo "Esiste già";
+     $check_nome_b = mysqli_query($conn, "SELECT nome_blog FROM blog WHERE nome_blog = '$_GET[blog]'") or die("Connessione fallita: " . mysqli_error($conn));
+     if (mysqli_num_rows($check_nome_b) > 0) echo "Esiste già";
 }
 
 if (isset($_GET['aggiungi_categoria'])) {
      // Cerca tutti i blog o categorie che contengono i caratteri del testo digitato
-     $query = "SELECT DISTINCT categoria FROM post WHERE categoria LIKE '%$_GET[aggiungi_categoria]%' LIMIT 6";
-     $result = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-     if (!empty($_GET['aggiungi_categoria'] && mysqli_num_rows($result) > 0)) {
-          while ($riga = mysqli_fetch_array($result)) {
+     $search = mysqli_query($conn, "SELECT DISTINCT categoria FROM post WHERE categoria LIKE '%$_GET[aggiungi_categoria]%' LIMIT 6") or die("Connessione fallita: " . mysqli_error($conn));
+     if (!empty($_GET['aggiungi_categoria'] && mysqli_num_rows($search) > 0)) {
+          while ($riga = mysqli_fetch_array($search)) {
                echo "<p class='result'>$riga[categoria]</p>";
           }
      }
@@ -212,10 +209,9 @@ if (isset($_POST['invia_commento'])) {
 
      // Se non sono stati inseriti caratteri tipici della SQL Injection nel commento
      if ($commento_ok) {
-          $sql = "INSERT INTO commenti (data_c, username, commento, id_post, stato) VALUES ('$data', '$username', '$commento', '$id_post', 1)";
-          $execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+          $execution = mysqli_query($conn, "INSERT INTO commenti (data_c, username, commento, id_post, stato) VALUES ('$data', '$username', '$commento', '$id_post', 1)") or die("Connessione fallita: " . mysqli_error($conn));
           if ($execution) echo "Aggiunto";
-     }
-     else echo "Dati corrotti";
+     } else echo "Dati corrotti";
 }
+mysqli_close($conn);
 ?>

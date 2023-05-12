@@ -96,10 +96,10 @@ CREATE TABLE IF NOT EXISTS messaggi (
 -- Dump dei dati per la tabella 'users'
 --
 INSERT INTO users (id, admin, add_data, username, nome, cognome, telefono, email, password, avatar, reso_admin_da) VALUES
-(1, b'1', '2021-07-01 15:00:00', 'Marcope', 'Marco', 'Petrucci', '3667493367', 'marco00petrucci@gmail.com', 'marcope00', 'marcope.jpg', 'Marcope'),
-(2, b'1', '2021-07-01 19:18:33', 'Ire', 'Irene', 'Franco', '3345673356', 'irenefranco@outlook.it', 'irebloggy', 'gatto.jpg', 'Marcope'),
-(3, b'0', '2021-07-05 10:10:56', 'Ale', 'Alessandro', 'Petrucci', NULL, 'alepe@gmail.com', 'alessandro', 'default.png', NULL),
-(4, b'0', '2021-07-07 12:30:40', 'Roby', 'Roberta', 'Rossi', NULL, 'roby@gmail.com', 'aleeroby', 'default.png', NULL);
+(1, b'1', '2021-07-01 15:00:00', 'Marcope', 'Marco', 'Petrucci', '3667493367', 'marco00petrucci@gmail.com', '$2y$10$xUtEB3Obqoxl0PojS/Ah7erTLWAG5J.ggUwR.25XAHfyUnjluu6o.', 'marcope.jpg', 'Marcope'),
+(2, b'1', '2021-07-01 19:18:33', 'Ire', 'Irene', 'Franco', '3345673356', 'irenefranco@outlook.it', '$2y$10$jXDsmtkXCvtwCO3ClYxCy.LCkX.tG8aEGrA9uLyhnGOoSrDqE2ZI.', 'gatto.jpg', 'Marcope'),
+(3, b'0', '2021-07-05 10:10:56', 'Ale', 'Alessandro', 'Petrucci', NULL, 'alepe@gmail.com', '$2y$10$1AxOouE79yORFqdHCpclfOf3pwKuE/0MkHwVVDHqfQGPdhydoyoC.', 'default.png', NULL),
+(4, b'0', '2021-07-07 12:30:40', 'Roby', 'Roberta', 'Rossi', NULL, 'roby@gmail.com', '$2y$10$64NxDdGbUfnkEDw8wCyjqeKQvJBn8vMxstJUBx7Is1lj2a7sL5Lhy', 'default.png', NULL);
 
 --
 -- Dump dei dati per la tabella 'blog'

@@ -4,12 +4,8 @@ require('../db_connect.php');
 
 // Verifica se l'utente è un admin ed è registrato al blog
 $username = $_SESSION['user_session'];
-$query = "SELECT admin FROM users WHERE username = '$username' AND admin = '1'";
-$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-
-if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
-	header("Location: ../index.php?no_access");
-}
+$check_admin = mysqli_query($conn, "SELECT admin FROM users WHERE username = '$username' AND admin = 1") or die("Connessione fallita: " . mysqli_error($conn));
+if (!isset($_SESSION['user_session']) || (mysqli_num_rows($check_admin) == 0)) header("Location: ../index.php?no_access");
 ?>
 
 <!DOCTYPE html>
@@ -118,20 +114,19 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 
 	// Se si sceglie di eliminare un messaggio
 	if (isset($_GET['elimina_messaggio'])) {
-		$sql = "DELETE FROM messaggi WHERE id = '$_GET[elimina_messaggio]'";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
-		if ($execution) {
+		$del_mess = mysqli_query($conn, "DELETE FROM messaggi WHERE id = '$_GET[elimina_messaggio]'") or die("Connessione fallita: " . mysqli_error($conn));
+		if ($del_mess) {
 			echo "<div class='avviso'>
 			  		<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
 			  		<p>Messaggio eliminato! 🗑</p>
-					  <script>setTimeout(\"window.location.href = 'messaggi.php'\", 2500);</script>
-		    		</div>";
+					<script>setTimeout(\"window.location.href = 'messaggi.php'\", 2500);</script>
+		    	</div>";
 		} else {
 			echo "<div class='avviso'>
-			  		<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+					<h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
 			  		<p>Qualcosa è andato storto! 😣</p>
-					  <script>setTimeout(\"window.location.href = 'messaggi.php'\", 2500);</script>
-		    		</div>";
+					<script>setTimeout(\"window.location.href = 'messaggi.php'\", 2500);</script>
+		    	</div>";
 		}
 	} ?>
 
@@ -140,10 +135,9 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 		<h3 id="descrizione">Visualizza i messaggi inviati dagli utenti e contattali!</h3>
 
 		<?php
-		$sql = "SELECT * FROM messaggi ORDER BY data_m";
-		$execution = mysqli_query($conn, $sql) or die("Connessione fallita: " . mysqli_error($conn));
+		$view_mess = mysqli_query($conn, "SELECT * FROM messaggi ORDER BY data_m") or die("Connessione fallita: " . mysqli_error($conn));
 		$postNo = 1;
-		if (mysqli_num_rows($execution) == 0) echo "<p id='risultati'>Nessun messaggio! 😵</p>";
+		if (mysqli_num_rows($view_mess) == 0) echo "<p id='risultati'>Nessun messaggio!</p>";
 		else { ?>
 			<table>
 				<thead>
@@ -159,7 +153,7 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</thead>
 				<tbody>
 					<?php
-					while ($result = mysqli_fetch_assoc($execution)) {
+					while ($result = mysqli_fetch_assoc($view_mess)) {
 						$commento_id = $result['id'];
 						$data_m = $result['data_m'];
 						$nome = $result['nome'];
@@ -198,12 +192,13 @@ if (!isset($_SESSION['user_session']) || (mysqli_num_rows($execution) == 0)) {
 				</tbody>
 			</table>
 		<?php
-		} ?>
+		}
+		mysqli_close($conn); ?>
 	</main>
 
 	<img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">
-	
-	<img src="../image/footer.svg" alt="Footer"> 
+
+	<img src="../image/footer.svg" alt="Footer">
 	<footer>
 		<a href="../about.php">All rights reserved | © 2021 | Created by Marco Petrucci</a>
 	</footer>

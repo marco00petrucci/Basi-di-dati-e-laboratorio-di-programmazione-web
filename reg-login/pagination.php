@@ -4,20 +4,15 @@ session_start();
 
 $username = $_SESSION['user_session'];
 
-// Verifica se l'utente è un admin
-$query_check = "SELECT * FROM users WHERE username = '$username' AND admin = 1";
-$check_admin = mysqli_query($conn, $query_check) or die("Connessione fallita: " . mysqli_error($conn));
+$check_admin = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username' AND admin = 1") or die("Connessione fallita: " . mysqli_error($conn));
 
 // Se l'utente non è un admin mostra tutti i post senza LIMIT
 if (mysqli_num_rows($check_admin) == 0) $query = "SELECT * FROM post WHERE autore = '$username' ORDER BY creato_il DESC";
 
 // Se l'utente è un admin mostra tutti i post con LIMIT
 else {
-     if (isset($_GET["page"])) {
-          $page = $_GET["page"];
-     } else {
-          $page = 1;
-     }
+     if (isset($_GET["page"])) $page = $_GET["page"];
+     else $page = 1;
 
      $limit = 5;
      $start_from = ($page - 1) * $limit;
@@ -101,6 +96,7 @@ if (mysqli_num_rows($exec) == 0) {
                      </td>
                </tr>";
           }
-     } ?>
+     }
+     mysqli_close($conn); ?>
           </tbody>
      </table>
