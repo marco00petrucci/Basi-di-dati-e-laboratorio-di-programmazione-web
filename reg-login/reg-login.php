@@ -167,7 +167,19 @@ if (isset($_GET['login'])) $nome_pagina = "Login";
                                    setTimeout('window.location.href = "dashboard.php"', 1600);
                               }
 
-                              // Se l'username e/o password non sono corretti
+                              // Se non esiste un username come quello digitato
+                              else if (risposta == "Username non trovato") {
+                                   $("#error").fadeIn(400);
+                                   $("#error").html('<img src="../image/warning.svg" alt="Cerca" width="20px" height="20px" >&nbsp;Username non trovato. <a href="reg-login.php?registrazione">Registrati!</a>');
+                              }
+
+                              // Se la password è errata
+                              else if (risposta == "Password errata") {
+                                   $("#error").fadeIn(400);
+                                   $("#error").html('<img src="../image/warning.svg" alt="Cerca" width="20px" height="20px" >&nbsp;Password errata. <a href="reg-login.php?registrazione">Registrati!</a>');
+                              }
+
+                              // Se qualcosa è andato storto
                               else {
                                    $("#error").fadeIn(400);
                                    $("#error").html('<img src="../image/warning.svg" alt="Cerca" width="20px" height="20px" >&nbsp;Username e/o password errati. <a href="reg-login.php?registrazione">Registrati!</a>');
