@@ -96,77 +96,84 @@ if (mysqli_num_rows($check_auth) == 0) header("Location: ../index.php?no_access"
 	?>
 
 	<header>
+		<input type="checkbox" id="menu-btn" />
+		<label id="menu-icon" for="menu-btn">
+			<span id="nav-icon"></span>
+		</label>
+
 		<!-- Logo sito -->
 		<a href="../index.php">
 			<img src="../image/logo.png" id="logo" alt="Logo" />
 		</a>
 
-		<!-- Cerca nel sito -->
-		<form action="../blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
-			<input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
-			<button type="submit" id="cercaBtn">
-				<img src="../image/search_icon.svg" alt="Cerca">
-			</button>
-			<div id="autocompletamento"></div>
-		</form>
+		<nav id="menu">
+			<!-- Cerca nel sito -->
+			<form action="../blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
+				<input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
+				<button type="submit" id="cercaBtn">
+					<img src="../image/search_icon.svg" alt="Cerca">
+				</button>
+				<div id="autocompletamento"></div>
+			</form>
 
-		<div id="utente">
-			<span id='dropdown_btn'>▾</span>
-			<ul id="subnav">
-				<?php
+			<div id="utente">
+				<span id='dropdown_btn'>▾</span>
+				<ul id="subnav">
+					<?php
 
-				// Verifica se l'utente è un admin
-				$username = $_SESSION['user_session'];
-				$query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
-				$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-				if (mysqli_num_rows($execution) > 0) {
-					while (mysqli_fetch_array($execution)) { ?>
+					// Verifica se l'utente è un admin
+					$username = $_SESSION['user_session'];
+					$query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
+					$execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+					if (mysqli_num_rows($execution) > 0) {
+						while (mysqli_fetch_array($execution)) { ?>
 
-						<!-- Se l'utente È un admin mostra tutti gli elementi: -->
+							<!-- Se l'utente È un admin mostra tutti gli elementi: -->
+							<li id="go_to_dashboard">Dashboard</li>
+							<li id="add_blog">Aggiungi blog</li>
+							<li id="manage_comments">Gestisci commenti</li>
+							<li id="manage_users">Gestisci utenti</li>
+							<li id="manage_messaggi">Gestisci messaggi</li>
+							<li id="logout">
+								<img src="../image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
+								<img src="../image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
+							</li>
+						<?php
+						}
+					} else {
+						echo "<style>@media screen and (max-width:950px) {#utente>a {margin-top: -158px}}</style>"; ?>
+
+						<!-- Se l'utente NON è un admin mostra questi elementi: -->
 						<li id="go_to_dashboard">Dashboard</li>
 						<li id="add_blog">Aggiungi blog</li>
-						<li id="manage_comments">Gestisci commenti</li>
-						<li id="manage_users">Gestisci utenti</li>
-						<li id="manage_messaggi">Gestisci messaggi</li>
 						<li id="logout">
 							<img src="../image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
 							<img src="../image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
 						</li>
 					<?php
 					}
-				} else { ?>
+					?>
+				</ul>
 
-					<!-- Se l'utente NON è un admin mostra questi elementi: -->
-					<li id="go_to_dashboard">Dashboard</li>
-					<li id="add_blog">Aggiungi blog</li>
-					<li id="logout">
-						<img src="../image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
-						<img src="../image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
-					</li>
-				<?php
-				}
-				?>
-			</ul>
+				<a href="account.php">
+					<?php
+					// Avatar
+					$username = $_SESSION['user_session'];
+					$avatar_query = "SELECT avatar FROM users WHERE username = '$username'";
+					$avatar = mysqli_query($conn, $avatar_query) or die("Connessione fallita: " . mysqli_error($conn));
+					if (mysqli_num_rows($avatar) > 0) {
+						$row = mysqli_fetch_array($avatar);
+						$imageURL = '../image/' . $row["avatar"];
+						echo "<img src = '$imageURL' id='user_icon' alt='Avatar'/>";
+					} ?>
+					<p class="dx" id="user_name"><?php echo ucfirst($_SESSION['user_session']) ?></p>
+				</a>
+			</div>
 
-			<a href="account.php">
-				<?php
-				// Avatar
-				$username = $_SESSION['user_session'];
-				$avatar_query = "SELECT avatar FROM users WHERE username = '$username'";
-				$avatar = mysqli_query($conn, $avatar_query) or die("Connessione fallita: " . mysqli_error($conn));
-				if (mysqli_num_rows($avatar) > 0) {
-					$row = mysqli_fetch_array($avatar);
-					$imageURL = '../image/' . $row["avatar"];
-					echo "<img src = '$imageURL' id='user_icon' alt='Avatar'/>";
-				} ?>
-				<p class="dx" id="user_name"><?php echo ucfirst($_SESSION['user_session']) ?></p>
-			</a>
-		</div>
-
-		<!-- Sezione about -->
-		<a href="../about.php" class="dx" title="About">About</a>
+			<!-- Sezione about -->
+			<a href="../about.php" class="dx" title="About">About</a>
+		</nav>
 	</header>
-
 	<nav id="nav_1"></nav>
 	<nav id="nav_2"></nav>
 

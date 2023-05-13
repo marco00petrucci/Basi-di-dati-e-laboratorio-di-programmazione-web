@@ -19,6 +19,22 @@
             padding: 1% 0%;
             text-align: center;
         }
+
+        #load_data_message button {
+            background: #fff;
+            border-radius: 10px;
+            text-align: center;
+            padding: 8px 25px;
+            border-bottom: 3px solid firebrick;
+            cursor: pointer;
+            transition: .5s;
+        }
+
+        #load_data_message button:hover {
+            padding: 10px 26px;
+            text-decoration: underline;
+            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.4);
+        }
     </style>
     <link rel="icon" href="image/logo_icona.png" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -49,23 +65,37 @@
                             $('#load_data_message').html("<p>Non ci sono altri post</p>");
                             action = 'attivo';
                         } else {
-                            $('#load_data_message').html("<p>Caricamento....&nbsp;<img src='../image/ajax-loader.gif' alt='Loader' /></p>");
-                            action = "inattivo";
+                            if ($(window).width() >= 950) {
+                                $('#load_data_message').html("<p>Caricamento....&nbsp;<img src='../image/ajax-loader.gif' alt='Loader' /></p>");
+                                action = "inattivo";
+                            } else $('#load_data_message').html("<button>Carica altri post</button>");
                         }
                     }
                 });
             }
 
-            // Visualizza 3 post in più se la pagina viene scrollata fino alla fine
-            $(window).scroll(function() {
-                if ($(window).scrollTop() + $(window).height() > $("#attach_posts").height() && action == 'inattivo') {
-                    action = 'attivo';
+            if ($(window).width() >= 950) {
+
+                // Visualizza 3 post in più se la pagina viene scrollata fino alla fine
+                $(window).scroll(function() {
+                    if ($(window).scrollTop() + $(window).height() > $("#attach_posts").height() && action == 'inattivo') {
+                        action = 'attivo';
+                        start += 3;
+                        setTimeout(function() {
+                            load_posts(start)
+                        }, 1000);
+                    }
+                });
+            } else {
+                $('#load_data_message').html("<button>Carica altri post</button>");
+                $('#load_data_message').click(function() {
+                    $('#load_data_message').html("<p>Caricamento....&nbsp;<img src='../image/ajax-loader.gif' alt='Loader' /></p>");
                     start += 3;
                     setTimeout(function() {
                         load_posts(start)
                     }, 1000);
-                }
-            });
+                });
+            }
         });
     </script>
 </head>
@@ -165,7 +195,8 @@
 
             <?php
             // Se non si è loggati al sito mostra l'opzione login/registrazione
-            if (!isset($_SESSION['user_session'])) { ?>
+            if (!isset($_SESSION['user_session'])) {
+                echo "<style>@media screen and (max-width:950px) {#menu>a {margin: 0 0 4px}}</style>"; ?>
                 <a href="reg-login/reg-login.php?login" class="dx" title="Effettua il login">Login</a>
                 <span id="divisore" class="dx">|</span>
                 <a href="reg-login/reg-login.php?registrazione" class="dx" title="Registrati">Registrati</a>
@@ -197,7 +228,8 @@
                                 </li>
                             <?php
                             }
-                        } else { ?>
+                        } else {
+                            echo "<style>@media screen and (max-width:950px) {#utente>a {margin-top: -158px}}</style>"; ?>
 
                             <!-- Se l'utente NON è un admin mostra questi elementi: -->
                             <li id="go_to_dashboard">Dashboard</li>

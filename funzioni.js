@@ -29,14 +29,16 @@ $(function () {
         $("#autocompletamento").hide();
     });
 
-    // Visualizza il subnav all'hover
-    $("#utente").hover(function () {
-        $("#subnav").fadeIn(50);
-        $('#dropdown_btn').css("color", "#000");
-    }, function () {
-        $('#subnav').fadeOut(50);
-        $('#dropdown_btn').css("color", "#fff");
-    });
+    // Visualizza il subnav all'hover tranne che nei telefoni
+    if ($(window).width() >= 950) {
+        $("#utente").hover(function () {
+            $("#subnav").fadeIn(50);
+            $('#dropdown_btn').css("color", "#000");
+        }, function () {
+            $('#subnav').fadeOut(50);
+            $('#dropdown_btn').css("color", "#fff");
+        });
+    }
 
     // Timeout al click del bottone dashboard
     $("#go_to_dashboard").click(function () {
@@ -181,7 +183,7 @@ $(function () {
         }
 
         // Fissa aside allo scroll
-        if (window.matchMedia("(min-width:1200px)").matches) {
+        if ($(window).width() >= 1200) {
             if ($(this).scrollTop() > 300) {
                 var position = $(window).scrollTop(); // Conta di quanto viene scrollata la pagina
                 var bottom = $(document).height() - $(window).height(); // Altezza totale della pagina
@@ -191,13 +193,13 @@ $(function () {
                     $('aside').css({ 'position': 'fixed', 'top': '-30%', "transition": ".1s ease-out" });
                     if (window.matchMedia("(max-width: 1600px)").matches) $('aside').css({ 'top': '-60%', "transition": ".1s ease-out" }); // Per gli schermi fino a 1600px di larghezza
                 }
-            } else {
-                $('aside').css({ 'position': 'absolute', 'top': '20%', "transition": "none" });
-            }
+            } else $('aside').css({ 'position': 'absolute', 'top': '20%', "transition": "none" });
         }
 
-        // Mostra icona Go to Top quando la pagina viene scrollata di 500px
-        if ($(document).scrollTop() > 500) $('#button_top').fadeIn(200);
-        else $('#button_top').fadeOut(300);
+        // Mostra icona Go to Top quando la pagina viene scrollata di 500px tranne che nei telefoni
+        if ($(window).width() >= 950) {
+            if ($(document).scrollTop() > 500) $('#button_top').fadeIn(200);
+            else $('#button_top').fadeOut(300);
+        }
     });
 });

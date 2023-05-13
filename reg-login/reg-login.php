@@ -176,7 +176,7 @@ if (isset($_GET['login'])) $nome_pagina = "Login";
                               // Se la password è errata
                               else if (risposta == "Password errata") {
                                    $("#error").fadeIn(400);
-                                   $("#error").html('<img src="../image/warning.svg" alt="Cerca" width="20px" height="20px" >&nbsp;Password errata. <a href="reg-login.php?registrazione">Registrati!</a>');
+                                   $("#error").html('<img src="../image/warning.svg" alt="Cerca" width="20px" height="20px" >&nbsp;Password errata.');
                               }
 
                               // Se qualcosa è andato storto
@@ -225,24 +225,35 @@ if (isset($_GET['login'])) $nome_pagina = "Login";
      </div>
 
      <header>
+          <input type="checkbox" id="menu-btn" />
+          <label id="menu-icon" for="menu-btn">
+               <span id="nav-icon"></span>
+          </label>
+
           <!-- Logo sito -->
           <a href="../index.php">
                <img src="../image/logo.png" id="logo" alt="Logo" />
           </a>
 
-          <!-- Cerca nel sito -->
-          <form action="../blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
-               <input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
-               <button type="submit" id="cercaBtn">
-                    <img src="../image/search_icon.svg" alt="Cerca">
-               </button>
-               <div id="autocompletamento"></div>
-          </form>
+          <nav id="menu">
+               <!-- Cerca nel sito -->
+               <form action="../blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
+                    <input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
+                    <button type="submit" id="cercaBtn">
+                         <img src="../image/search_icon.svg" alt="Cerca">
+                    </button>
+                    <div id="autocompletamento"></div>
+               </form>
 
-          <a href="reg-login.php?login" class="dx" title="Effettua il login">Login</a>
-          <span id="divisore" class="dx">|</span>
-          <a href="reg-login.php?registrazione" class="dx" title="Registrati">Registrati</a>
-          <a href="../about.php" class="dx" title="About">About</a>
+               <?php
+               echo "<style>@media screen and (max-width:950px) {#menu>a {margin: 0 0 4px}}</style>"; ?>
+               <a href="reg-login.php?login" class="dx" title="Effettua il login">Login</a>
+               <span id="divisore" class="dx">|</span>
+               <a href="reg-login.php?registrazione" class="dx" title="Registrati">Registrati</a>
+
+               <!-- Sezione about -->
+               <a href="../about.php" class="dx" title="About">About</a>
+          </nav>
      </header>
 
      <nav id="nav_1"></nav>

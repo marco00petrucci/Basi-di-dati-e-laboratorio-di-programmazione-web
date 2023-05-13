@@ -4,7 +4,15 @@ require('../db_connect.php');
 
 date_default_timezone_set('Europe/Rome');
 $data = date('Y-m-d H:i:s');
-$vietate = array("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "<script>");
+
+function check_SQL_inj($test, $ok)
+{
+     $vietate = array("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "<script>");
+     for ($k = 0; $k <= 6 && $ok; $k++) {
+          if (stripos($test, $vietate[$k]) !== false) $ok = false;
+     }
+     return $ok;
+}
 
 // Invia il messaggio
 if (isset($_POST['cont_invia'])) {
@@ -13,32 +21,18 @@ if (isset($_POST['cont_invia'])) {
      $telefono = mysqli_real_escape_string($conn, $_POST['Atelefono']);
      $messaggio = mysqli_real_escape_string($conn, $_POST['messaggio']);
 
-     $nome_ok = true;
-     for ($k = 0; $k <= 6 && $nome_ok; $k++) {
-          if (stripos($nome, $vietate[$k]) !== false) $nome_ok = false;
-     }
+     $nome_ok = $email_ok = $telefono_ok = $messaggio_ok = true;
+     if (empty($telefono)) $telefono_is_ok = true;
+     else $telefono_is_ok = check_SQL_inj($telefono, $telefono_ok);
 
-     $email_ok = true;
-     for ($k = 0; $k <= 6 && $email_ok; $k++) {
-          if (stripos($email, $vietate[$k]) !== false) $email_ok = false;
-     }
-
-     if (!empty($telefono)) {
-          $telefono_ok = true;
-          for ($k = 0; $k <= 6 && $telefono_ok; $k++) {
-               if (stripos($telefono, $vietate[$k]) !== false) $telefono_ok = false;
-          }
-     } else $telefono_ok = true;
-
-     $messaggio_ok = true;
-     for ($k = 0; $k <= 6 && $messaggio_ok; $k++) {
-          if (stripos($messaggio, $vietate[$k]) !== false) $messaggio_ok = false;
-     }
+     $nome_is_ok = check_SQL_inj($nome, $nome_ok);
+     $email_is_ok = check_SQL_inj($email, $email_ok);
+     $messaggio_is_ok = check_SQL_inj($messaggio, $messaggio_ok);
 
      // Se non sono stati inseriti caratteri tipici della SQL Injection
-     if ($nome_ok && $email_ok && $telefono_ok && $messaggio_ok) {
-          $mex_execution = mysqli_query($conn, "INSERT INTO messaggi (data_m, nome, email, telefono, messaggio) VALUES ('$data', '$nome', '$email', '$telefono', '$messaggio')") or die("Connessione fallita: " . mysqli_error($conn));
-          if ($mex_execution) echo "Messaggio inviato";
+     if ($nome_is_ok && $email_is_ok && $telefono_is_ok && $messaggio_is_ok) {
+          mysqli_query($conn, "INSERT INTO messaggi (data_m, nome, email, telefono, messaggio) VALUES ('$data', '$nome', '$email', '$telefono', '$messaggio')") or die("Connessione fallita: " . mysqli_error($conn));
+          echo "Messaggio inviato";
      } else echo "Dati corrotti";
 }
 
@@ -50,68 +44,43 @@ if (isset($_POST['reg_btn'])) {
      $email = mysqli_real_escape_string($conn, $_POST['Remail']);
      $password = mysqli_real_escape_string($conn, $_POST['Rpassword']);
 
-     $username_query = "SELECT * FROM users WHERE username = '$username'";
-     $username_exec = mysqli_query($conn, $username_query) or die("Connessione fallita: " . mysqli_error($conn));
-     $username_result = mysqli_fetch_assoc($username_exec);
+     $username_query = mysqli_query($conn, "SELECT username FROM users WHERE username = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
 
-     $email_query = "SELECT * FROM users WHERE email = '$email'";
-     $email_exec = mysqli_query($conn, $email_query) or die("Connessione fallita: " . mysqli_error($conn));
-     $email_result = mysqli_fetch_assoc($email_exec);
+     $email_query = mysqli_query($conn, "SELECT email FROM users WHERE email = '$email'") or die("Connessione fallita: " . mysqli_error($conn));
 
      // Verifica se l'username è già stato preso
-     if (mysqli_num_rows($username_exec) > 0 && $username_result['username'] == $username) echo "Username già esistente";
+     if (mysqli_num_rows($username_query) > 0) echo "Username già esistente";
 
      // Verifica se l'email è già stata presa
-     else if (mysqli_num_rows($email_exec) > 0 && $email_result['email'] == $email) echo "Email già esistente";
+     else if (mysqli_num_rows($email_query) > 0) echo "Email già esistente";
 
      // Se l'username o l'email non sono state già prese
      else {
-          $nome_ok = true;
-          for ($k = 0; $k <= 6 && $nome_ok; $k++) {
-               if (stripos($nome, $vietate[$k]) !== false) $nome_ok = false;
-          }
-
-          $cognome_ok = true;
-          for ($k = 0; $k <= 6 && $cognome_ok; $k++) {
-               if (stripos($cognome, $vietate[$k]) !== false) $cognome_ok = false;
-          }
-
-          $username_ok = true;
-          for ($k = 0; $k <= 6 && $username_ok; $k++) {
-               if (stripos($username, $vietate[$k]) !== false) $username_ok = false;
-          }
-
-          $email_ok = true;
-          for ($k = 0; $k <= 6 && $email_ok; $k++) {
-               if (stripos($email, $vietate[$k]) !== false) $email_ok = false;
-          }
-
-          $password_ok = true;
-          for ($k = 0; $k <= 6 && $password_ok; $k++) {
-               if (stripos($password, $vietate[$k]) !== false) $password_ok = false;
-          }
+          $nome_ok = $cognome_ok = $username_ok = $email_ok = $password_ok = true;
+          $nome_is_ok = check_SQL_inj($nome, $nome_ok);
+          $cognome_is_ok = check_SQL_inj($cognome, $cognome_ok);
+          $username_is_ok = check_SQL_inj($username, $username_ok);
+          $email_is_ok = check_SQL_inj($email, $email_ok);
+          $password_is_ok = check_SQL_inj($password, $password_ok);
 
           // Se non sono stati inseriti caratteri tipici della SQL Injection
-          if ($nome_ok && $cognome_ok && $username_ok && $email_ok && $password_ok) {
+          if ($nome_is_ok && $cognome_is_ok && $username_is_ok && $email_is_ok && $password_is_ok) {
                $crypt_password = password_hash($password, PASSWORD_DEFAULT);
-               $query = "INSERT INTO users (add_data, username, nome, cognome, email, password) VALUES ('$data', '$username', '$nome', '$cognome', '$email', '$crypt_password')";
-               $reg_exec = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-               if ($reg_exec) {
-                    $_SESSION['user_session'] = $username;
-                    echo "Registrato";
-               }
+               $reg_exec = mysqli_query($conn, "INSERT INTO users (add_data, username, nome, cognome, email, password) VALUES ('$data', '$username', '$nome', '$cognome', '$email', '$crypt_password')") or die("Connessione fallita: " . mysqli_error($conn));
+               $_SESSION['user_session'] = $username;
+               echo "Registrato";
           } else echo "Dati corrotti";
      }
 }
 
 // Verifica il funzionamento del login
 if (isset($_POST['login_btn'])) {
-     $username = trim($_POST['Lusername']);
+     $username = mysqli_real_escape_string($conn, $_POST['Lusername']);
      $find_username = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
      if (mysqli_num_rows($find_username) > 0) {
           $result_user = mysqli_fetch_assoc($find_username);
           $hash_user = $result_user['password'];
-          $password = trim($_POST['Lpassword']);
+          $password = mysqli_real_escape_string($conn, $_POST['Lpassword']);
           if (password_verify($password, $hash_user)) {
                echo "Login effettuato";
                $_SESSION['user_session'] = $username;
@@ -128,57 +97,35 @@ if (isset($_POST['modifica_btn'])) {
      $epassword = mysqli_real_escape_string($conn, $_POST['Mpassword']);
      $ecpassword = mysqli_real_escape_string($conn, $_POST['Mcpassword']);
 
-     // Verifica se l'email è già stata presa
-     $email_query = "SELECT * FROM users WHERE email = '$email'";
-     $email_exec = mysqli_query($conn, $email_query) or die("Connessione fallita: " . mysqli_error($conn));
-     $email_result = mysqli_fetch_assoc($email_exec);
+     // Verifica che la mail sia stata cambiata dall'utente
+     if ($_POST["email_vecchia"] != $email) {
 
-     if (mysqli_num_rows($email_exec) > 0 && $email_result['email'] == $email && $_POST["email_vecchia"] != $email) echo "Email già esistente";
+          // Verifica se l'email è già stata presa
+          $check_email = mysqli_query($conn, "SELECT email FROM users WHERE email = '$email'") or die("Connessione fallita: " . mysqli_error($conn));
+          if (mysqli_num_rows($check_email) > 0) echo "Email già esistente";
 
-     // Se la email non è già stata presa
-     else {
-          $nome_ok = true;
-          for ($k = 0; $k <= 6 && $nome_ok; $k++) {
-               if (stripos($nome, $vietate[$k]) !== false) $nome_ok = false;
+          // Se la email non è già stata presa
+          else {
+               $nome_ok = $cognome_ok = $email_ok = $epassword_ok = true;
+               $nome_is_ok = check_SQL_inj($nome, $nome_ok);
+               $cognome_is_ok = check_SQL_inj($cognome, $cognome_ok);
+               $email_is_ok = check_SQL_inj($email, $email_ok);
+               // $epassword_is_ok = check_SQL_inj($epassword, $epassword_ok);
+
+               if (empty($telefono)) $telefono_is_ok = true;
+               else $telefono_is_ok = check_SQL_inj($telefono, $telefono_ok);
+               // if (empty($ecpassword)) $ecpassword_is_ok = true;
+               // else $ecpassword_is_ok = check_SQL_inj($ecpassword, $ecpassword_ok);
+
+               // Se non sono stati inseriti caratteri tipici della SQL Injection
+               if ($nome_is_ok && $cognome_is_ok && $telefono_is_ok && $email_is_ok) {
+                    if (empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
+                    else $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = '$telefono', email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
+                    $edit_exec = mysqli_query($conn, $Uquery) or die("Connessione fallita: " . mysqli_error($conn));
+                    if ($edit_exec) echo "Modificato";
+               } else echo "Dati corrotti";
           }
-
-          $cognome_ok = true;
-          for ($k = 0; $k <= 6 && $cognome_ok; $k++) {
-               if (stripos($cognome, $vietate[$k]) !== false) $cognome_ok = false;
-          }
-
-          if (!empty($telefono)) {
-               $telefono_ok = true;
-               for ($k = 0; $k <= 6 && $telefono_ok; $k++) {
-                    if (stripos($telefono, $vietate[$k]) !== false) $telefono_ok = false;
-               }
-          } else $telefono_ok = true;
-
-          $email_ok = true;
-          for ($k = 0; $k <= 6 && $email_ok; $k++) {
-               if (stripos($email, $vietate[$k]) !== false) $email_ok = false;
-          }
-
-          $epassword_ok = true;
-          for ($k = 0; $k <= 6 && $epassword_ok; $k++) {
-               if (stripos($epassword, $vietate[$k]) !== false) $epassword_ok = false;
-          }
-
-          if (!empty($ecpassword)) {
-               $ecpassword_ok = true;
-               for ($k = 0; $k <= 6 && $ecpassword_ok; $k++) {
-                    if (stripos($ecpassword, $vietate[$k]) !== false) $ecpassword_ok = false;
-               }
-          } else $ecpassword_ok = true;
-
-          // Se non sono stati inseriti caratteri tipici della SQL Injection
-          if ($nome_ok && $cognome_ok && $telefono_ok && $email_ok && $epassword_ok && $ecpassword_ok) {
-               if (empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
-               else $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = '$telefono', email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
-               $edit_exec = mysqli_query($conn, $Uquery) or die("Connessione fallita: " . mysqli_error($conn));
-               if ($edit_exec) echo "Modificato";
-          } else echo "Dati corrotti";
-     }
+     } echo "Email invariata";
 }
 
 if (isset($_GET['blog'])) {
@@ -204,14 +151,13 @@ if (isset($_POST['invia_commento'])) {
      $id_post = mysqli_real_escape_string($conn, $_POST['id_post']);
 
      $commento_ok = true;
-     for ($k = 0; $k <= 6 && $commento_ok; $k++) {
-          if (stripos($commento, $vietate[$k]) !== false) $commento_ok = false;
-     }
+     $commento_is_ok = check_SQL_inj($commento, $commento_ok);
 
      // Se non sono stati inseriti caratteri tipici della SQL Injection nel commento
-     if ($commento_ok) {
+     if ($commento_is_ok) {
           $execution = mysqli_query($conn, "INSERT INTO commenti (data_c, username, commento, id_post, stato) VALUES ('$data', '$username', '$commento', '$id_post', 1)") or die("Connessione fallita: " . mysqli_error($conn));
           if ($execution) echo "Aggiunto";
      } else echo "Dati corrotti";
 }
 mysqli_close($conn);
+?>

@@ -169,75 +169,83 @@ if (isset($_GET['aggiungi_post'])) {
      </div>
 
      <header>
+          <input type="checkbox" id="menu-btn" />
+          <label id="menu-icon" for="menu-btn">
+               <span id="nav-icon"></span>
+          </label>
+
           <!-- Logo sito -->
           <a href="../index.php">
                <img src="../image/logo.png" id="logo" alt="Logo" />
           </a>
 
-          <!-- Cerca nel sito -->
-          <form action="../blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
-               <input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
-               <button type="submit" id="cercaBtn">
-                    <img src="../image/search_icon.svg" alt="Cerca">
-               </button>
-               <div id="autocompletamento"></div>
-          </form>
+          <nav id="menu">
+               <!-- Cerca nel sito -->
+               <form action="../blog.php" method="get" id="cerca" name="cerca" title="Cerca nel sito...">
+                    <input type="search" id="testoCerca" name="testoCerca" placeholder="Cerca..." />
+                    <button type="submit" id="cercaBtn">
+                         <img src="../image/search_icon.svg" alt="Cerca">
+                    </button>
+                    <div id="autocompletamento"></div>
+               </form>
 
-          <div id="utente">
-               <span id='dropdown_btn'>▾</span>
-               <ul id="subnav">
-                    <?php
+               <div id="utente">
+                    <span id='dropdown_btn'>▾</span>
+                    <ul id="subnav">
+                         <?php
 
-                    // Verifica se l'utente è un admin
-                    $username = $_SESSION['user_session'];
-                    $query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
-                    $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
-                    if (mysqli_num_rows($execution) > 0) {
-                         while (mysqli_fetch_array($execution)) { ?>
+                         // Verifica se l'utente è un admin
+                         $username = $_SESSION['user_session'];
+                         $query = "SELECT admin FROM users WHERE username = '$username' AND admin = 1";
+                         $execution = mysqli_query($conn, $query) or die("Connessione fallita: " . mysqli_error($conn));
+                         if (mysqli_num_rows($execution) > 0) {
+                              while (mysqli_fetch_array($execution)) { ?>
 
-                              <!-- Se l'utente È un admin mostra tutti gli elementi: -->
+                                   <!-- Se l'utente È un admin mostra tutti gli elementi: -->
+                                   <li id="go_to_dashboard">Dashboard</li>
+                                   <li id="add_blog">Aggiungi blog</li>
+                                   <li id="manage_comments">Gestisci commenti</li>
+                                   <li id="manage_users">Gestisci utenti</li>
+                                   <li id="manage_messaggi">Gestisci messaggi</li>
+                                   <li id="logout">
+                                        <img src="../image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
+                                        <img src="../image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
+                                   </li>
+                              <?php
+                              }
+                         } else {
+                              echo "<style>@media screen and (max-width:950px) {#utente>a {margin-top: -158px}}</style>"; ?>
+
+                              <!-- Se l'utente NON è un admin mostra questi elementi: -->
                               <li id="go_to_dashboard">Dashboard</li>
                               <li id="add_blog">Aggiungi blog</li>
-                              <li id="manage_comments">Gestisci commenti</li>
-                              <li id="manage_users">Gestisci utenti</li>
-                              <li id="manage_messaggi">Gestisci messaggi</li>
                               <li id="logout">
                                    <img src="../image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
                                    <img src="../image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
                               </li>
                          <?php
                          }
-                    } else { ?>
+                         ?>
+                    </ul>
 
-                         <!-- Se l'utente NON è un admin mostra questi elementi: -->
-                         <li id="go_to_dashboard">Dashboard</li>
-                         <li id="add_blog">Aggiungi blog</li>
-                         <li id="logout">
-                              <img src="../image/login.png" class="button_icon icona statica reg-login" style="margin-top:2.5px" alt="Logout">
-                              <img src="../image/login.gif" class="button_icon icona attiva reg-login" alt="Logout">&nbsp;Logout
-                         </li>
-                    <?php
-                    }
-                    ?>
-               </ul>
+                    <a href="account.php">
+                         <?php
+                         // Avatar
+                         $username = $_SESSION['user_session'];
+                         $avatar_query = "SELECT avatar FROM users WHERE username = '$username'";
+                         $avatar = mysqli_query($conn, $avatar_query) or die("Connessione fallita: " . mysqli_error($conn));
+                         if (mysqli_num_rows($avatar) > 0) {
+                              $row = mysqli_fetch_array($avatar);
+                              $imageURL = '../image/' . $row["avatar"];
+                              echo "<img src = '$imageURL' id='user_icon' alt='Avatar'/>";
+                         } ?>
+                         <p class="dx" id="user_name"><?php echo ucfirst($_SESSION['user_session']) ?></p>
+                    </a>
+               </div>
 
-               <a href="account.php">
-                    <?php
-                    // Avatar
-                    $username = $_SESSION['user_session'];
-                    $avatar_query = "SELECT avatar FROM users WHERE username = '$username'";
-                    $avatar = mysqli_query($conn, $avatar_query) or die("Connessione fallita: " . mysqli_error($conn));
-                    if (mysqli_num_rows($avatar) > 0) {
-                         $row = mysqli_fetch_array($avatar);
-                         $imageURL = '../image/' . $row["avatar"];
-                         echo "<img src = '$imageURL' id='user_icon' alt='Avatar'/>";
-                    } ?>
-                    <p class="dx" id="user_name"><?php echo ucfirst($_SESSION['user_session']) ?></p>
-               </a>
-          </div>
-
-          <!-- Sezione about -->
-          <a href="../about.php" class="dx" title="About">About</a>
+               <!-- Sezione about -->
+               <a href="../about.php" class="dx" title="About">About</a>
+          </nav>
      </header>
 
      <nav id="nav_1"></nav>
@@ -403,7 +411,15 @@ if (isset($_GET['aggiungi_post'])) {
      <?php
      date_default_timezone_set('Europe/Rome');
      $dateTime = date('Y-m-d H:i:s');
-     $vietate = array("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "<script>");
+
+     function check_SQL_inj($test, $ok)
+     {
+          $vietate = array("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "<script>");
+          for ($k = 0; $k <= 6 && $ok; $k++) {
+               if (stripos($test, $vietate[$k]) !== false) $ok = false;
+          }
+          return $ok;
+     }
 
      if (isset($_POST['aggiungi_blog_post'])) {
           $nome_blog = mysqli_real_escape_string($conn, $_POST['nome_blog']);
@@ -418,28 +434,14 @@ if (isset($_GET['aggiungi_post'])) {
           $immagine_post = $_FILES['immagine_post']['name'];
           $image_post_directory = "../image/" . basename($_FILES['immagine_post']['name']);
 
-          $nome_blog_ok = true;
-          for ($k = 0; $k <= 6 && $nome_blog_ok; $k++) {
-               if (stripos($nome_blog, $vietate[$k]) !== false) $nome_blog_ok = false;
-          }
-
-          $titolo_ok = true;
-          for ($k = 0; $k <= 6 && $titolo_ok; $k++) {
-               if (stripos($titolo, $vietate[$k]) !== false) $titolo_ok = false;
-          }
-
-          $nome_categoria_ok = true;
-          for ($k = 0; $k <= 6 && $nome_categoria_ok; $k++) {
-               if (stripos($nome_categoria, $vietate[$k]) !== false) $nome_categoria_ok = false;
-          }
-
-          $contenuto_ok = true;
-          for ($k = 0; $k <= 6 && $contenuto_ok; $k++) {
-               if (stripos($contenuto, $vietate[$k]) !== false) $contenuto_ok = false;
-          }
+          $nome_blog_ok = $titolo_ok = $nome_categoria_ok = $contenuto_ok = true;
+          $nome_blog_is_ok = check_SQL_inj($nome_blog, $nome_blog_ok);
+          $titolo_is_ok = check_SQL_inj($titolo, $titolo_ok);
+          $nome_categoria_is_ok = check_SQL_inj($nome_categoria, $nome_categoria_ok);
+          $contenuto_is_ok = check_SQL_inj($contenuto, $contenuto_ok);
 
           // Se non sono stati inseriti caratteri tipici della SQL Injection
-          if ($nome_blog_ok && $titolo_ok && $nome_categoria_ok && $contenuto_ok) {
+          if ($nome_blog_is_ok && $titolo_is_ok && $nome_categoria_is_ok && $contenuto_is_ok) {
 
                // Se non si sceglie nessun co-autore per il blog
                if ($co_autore == "Nessun co-autore") $query = "INSERT INTO blog (creato_il, nome_blog, autore, co_autore, immagine) VALUES ('$dateTime', '$nome_blog', '$autore', NULL, '$immagine_blog');";
@@ -470,23 +472,13 @@ if (isset($_GET['aggiungi_post'])) {
           $immagine = $_FILES['immagine_nuovo_post']['name'];
           $imageDirectory = "../image/" . basename($_FILES['immagine_nuovo_post']['name']);
 
-          $titolo_ok = true;
-          for ($k = 0; $k <= 6 && $titolo_ok; $k++) {
-               if (stripos($titolo, $vietate[$k]) !== false) $titolo_ok = false;
-          }
-
-          $add_categoria_ok = true;
-          for ($k = 0; $k <= 6 && $add_categoria_ok; $k++) {
-               if (stripos($add_categoria, $vietate[$k]) !== false) $add_categoria_ok = false;
-          }
-
-          $contenuto_ok = true;
-          for ($k = 0; $k <= 6 && $contenuto_ok; $k++) {
-               if (stripos($contenuto, $vietate[$k]) !== false) $contenuto_ok = false;
-          }
+          $titolo_ok = $add_categoria_ok = $contenuto_ok = true;
+          $titolo_is_ok = check_SQL_inj($titolo, $titolo_ok);
+          $add_categoria_is_ok = check_SQL_inj($add_categoria, $add_categoria_ok);
+          $contenuto_is_ok = check_SQL_inj($contenuto, $contenuto_ok);
 
           // Se non sono stati inseriti caratteri tipici della SQL Injection
-          if ($titolo_ok && $add_categoria_ok && $contenuto_ok) {
+          if ($titolo_is_ok && $add_categoria_is_ok && $contenuto_is_ok) {
                $query_post = "INSERT INTO post (creato_il, nome_b, categoria, titolo, autore, contenuto, immagine) VALUES ('$dateTime', '$blog_da_modificare', '$add_categoria', '$titolo', '$autore', '$contenuto', '$immagine')";
                $execution = mysqli_query($conn, $query_post) or die("Connessione fallita: " . mysqli_error($conn));
                if ($execution) {
