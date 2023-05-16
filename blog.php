@@ -7,7 +7,7 @@
 	<title>Bloggy | <?php if (isset($_GET["testoCerca"])) echo $_GET["testoCerca"];
 					else echo "Blog" ?></title>
 	<style>
-		@import url("index.css");
+		@import url("style.css");
 		@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 	</style>
 	<link rel="icon" href="image/logo_icona.png" />

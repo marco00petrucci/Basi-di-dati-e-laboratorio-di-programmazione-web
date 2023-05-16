@@ -20,7 +20,7 @@ mysqli_query($conn, "SELECT * FROM post ORDER BY id ASC LIMIT $start_from, $limi
      <meta name="viewport" content="width=device-width, initial-scale=1">
      <title>Bloggy | Dashboard</title>
      <style>
-          @import url("../index.css");
+          @import url("../style.css");
           @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
      </style>
      <link rel="icon" href="../image/logo_icona.png" />
@@ -175,9 +175,9 @@ mysqli_query($conn, "SELECT * FROM post ORDER BY id ASC LIMIT $start_from, $limi
                     </div>";
           } else {
                echo "<div class='avviso'>
-                    <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Qualcosa è andato storto... Perpiacere riprova!</p>
-                    <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
+                         <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                         <p>Qualcosa è andato storto... Perpiacere riprova!</p>
+                         <script>setTimeout(\"window.location.href = 'dashboard.php'\", 2500);</script>
                     </div>";
           }
      }

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bloggy | About</title>
     <style>
-        @import url("index.css");
+        @import url("style.css");
         @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 
         #contatti {

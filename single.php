@@ -22,7 +22,7 @@ if (isset($_GET['id'])) {
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Bloggy | <?php echo $post_titolo; ?></title>
 	<style>
-		@import url("index.css");
+		@import url("style.css");
 
 		main {
 			margin-top: 150px

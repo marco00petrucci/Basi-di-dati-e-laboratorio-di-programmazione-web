@@ -34,7 +34,7 @@ if (mysqli_num_rows($check_auth) == 0) header("Location: ../index.php?no_access"
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Bloggy | Modifica post <?php echo '"' . $titolo . '"' ?></title>
 	<style>
-		@import url("../index.css");
+		@import url("../style.css");
 		@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 	</style>
 	<link rel="icon" href="../image/logo_icona.png" />

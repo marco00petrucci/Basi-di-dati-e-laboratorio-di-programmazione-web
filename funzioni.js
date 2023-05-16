@@ -38,6 +38,19 @@ $(function () {
             $('#subnav').fadeOut(50);
             $('#dropdown_btn').css("color", "#fff");
         });
+    } else {
+
+        // Nascondi il menu quando si clicca fuori da esso o sul button chiudi
+        $("body").click(function (event) {
+            if ($(event.target).is($("#menu-btn"))) {
+                if (!$("#menu").hasClass('show')) $("#menu").addClass('show');
+                else $("#menu").removeClass('show');
+            }
+            if (($(event.target).is($("#nav_2")) || document.getElementsByTagName("main")[0].contains(event.target)) && $("#menu").hasClass('show')) {
+                $("#menu").removeClass('show');
+                $("#menu-btn").prop('checked', false);
+            }
+        });
     }
 
     // Timeout al click del bottone dashboard
@@ -151,8 +164,9 @@ $(function () {
                 "background": "rgb(255, 255, 255, 1)",
                 "box-shadow": "0 0 10px 0 rgba(0, 0, 0, 0.5)"
             });
-            $('#nav_2').css("transform", "translateY(-100%)");
-            $('header').css("margin", "0 3%");
+            $('#nav_2').css("transform", "translateY(-100%)");            
+            if ($(window).width() >= 950) $('header').css("margin", "0 3%");
+            else $('header').css("margin", "2% 3%");
             $('#logo').attr("src", "image/logo_nero.png");
             $("#logo").hover(function () {
                 $("#logo").attr("src", "image/logo_nero.png");

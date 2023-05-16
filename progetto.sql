@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   password varchar(100) NOT NULL,
   avatar varchar(100) NOT NULL DEFAULT 'default.png',
   reso_admin_da varchar(100) DEFAULT NULL,
-  FOREIGN KEY (reso_admin_da) REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (reso_admin_da) REFERENCES users (username) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 --
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS blog (
   co_autore varchar(100) DEFAULT NULL,
   immagine varchar(100) NOT NULL,
   FOREIGN KEY (autore) REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (co_autore) REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (co_autore) REFERENCES users (username) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 --
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS commenti (
   approved_by varchar(100) DEFAULT NULL,
   FOREIGN KEY (username) REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (id_post) REFERENCES post (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (approved_by) REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (approved_by) REFERENCES users (username) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 --
@@ -180,7 +180,10 @@ INSERT INTO voti (id, username, voto, id_post) VALUES
 (5, 'Marcope', '4', 2),
 (6, 'Ire', '5', 16),
 (7, 'Ale', '4', 16),
-(8, 'Ire', '5', 3);
+(8, 'Ire', '5', 3),
+(9, 'Ire', '5', 13),
+(10, 'Roby', '4', 12),
+(11, 'Ire', '4', 1);
 
 --
 -- Dump dei dati per la tabella 'messaggi'

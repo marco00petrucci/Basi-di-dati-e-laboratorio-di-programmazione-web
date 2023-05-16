@@ -25,7 +25,7 @@ if (isset($_GET['aggiungi_post'])) {
           if (!isset($_GET['aggiungi_post'])) echo "blog";
           else echo "post" ?></title>
      <style>
-          @import url("../index.css");
+          @import url("../style.css");
           @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 
           main h3:not(#descrizione) {

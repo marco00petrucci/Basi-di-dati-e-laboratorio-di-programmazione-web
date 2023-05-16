@@ -97,35 +97,37 @@ if (isset($_POST['modifica_btn'])) {
      $epassword = mysqli_real_escape_string($conn, $_POST['Mpassword']);
      $ecpassword = mysqli_real_escape_string($conn, $_POST['Mcpassword']);
 
-     // Verifica che la mail sia stata cambiata dall'utente
-     if ($_POST["email_vecchia"] != $email) {
+     // Verifica che la mail sia stata cambiata dall'utente Verifica se l'email è già stata presa
+     $check_email = mysqli_query($conn, "SELECT email FROM users WHERE email = '$email'") or die("Connessione fallita: " . mysqli_error($conn));
+     if ($_POST["email_vecchia"] != $email && mysqli_num_rows($check_email) > 0) echo "Email già esistente";
 
-          // Verifica se l'email è già stata presa
-          $check_email = mysqli_query($conn, "SELECT email FROM users WHERE email = '$email'") or die("Connessione fallita: " . mysqli_error($conn));
-          if (mysqli_num_rows($check_email) > 0) echo "Email già esistente";
+     // Se la email non è già stata presa
+     else {
+          $nome_ok = $cognome_ok = $telefono_ok = $email_ok = $epassword_ok = true;
+          $nome_is_ok = check_SQL_inj($nome, $nome_ok);
+          $cognome_is_ok = check_SQL_inj($cognome, $cognome_ok);
+          if (!empty($telefono)) $telefono_is_ok = check_SQL_inj($telefono, $telefono_ok);
+          else $telefono_is_ok = true;
+          $email_is_ok = check_SQL_inj($email, $email_ok);
+          if (!empty($epassword)) $epassword_is_ok = check_SQL_inj($epassword, $epassword_ok);
+          else $epassword_is_ok = true;
 
-          // Se la email non è già stata presa
-          else {
-               $nome_ok = $cognome_ok = $email_ok = $epassword_ok = true;
-               $nome_is_ok = check_SQL_inj($nome, $nome_ok);
-               $cognome_is_ok = check_SQL_inj($cognome, $cognome_ok);
-               $email_is_ok = check_SQL_inj($email, $email_ok);
-               // $epassword_is_ok = check_SQL_inj($epassword, $epassword_ok);
+          // Se non sono stati inseriti caratteri tipici della SQL Injection
+          if ($nome_is_ok && $cognome_is_ok && $telefono_is_ok && $email_is_ok && $epassword_is_ok) {
 
-               if (empty($telefono)) $telefono_is_ok = true;
-               else $telefono_is_ok = check_SQL_inj($telefono, $telefono_ok);
-               // if (empty($ecpassword)) $ecpassword_is_ok = true;
-               // else $ecpassword_is_ok = check_SQL_inj($ecpassword, $ecpassword_ok);
+               if (empty($epassword)) {
+                    if (empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email' WHERE username = '$_SESSION[user_session]'";
+                    else $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = '$telefono', email = '$email' WHERE username = '$_SESSION[user_session]'";
+               } else {
+                    $crypt_password = password_hash($epassword, PASSWORD_DEFAULT);
+                    if (empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email', password = '$crypt_password' WHERE username = '$_SESSION[user_session]'";
+                    else $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = '$telefono', email = '$email', password = '$crypt_password' WHERE username = '$_SESSION[user_session]'";
+               }
 
-               // Se non sono stati inseriti caratteri tipici della SQL Injection
-               if ($nome_is_ok && $cognome_is_ok && $telefono_is_ok && $email_is_ok) {
-                    if (empty($telefono)) $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = NULL, email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
-                    else $Uquery = "UPDATE users SET nome = '$nome', cognome = '$cognome', telefono = '$telefono', email = '$email', password = '$epassword' WHERE username = '$_SESSION[user_session]'";
-                    $edit_exec = mysqli_query($conn, $Uquery) or die("Connessione fallita: " . mysqli_error($conn));
-                    if ($edit_exec) echo "Modificato";
-               } else echo "Dati corrotti";
-          }
-     } echo "Email invariata";
+               $edit_exec = mysqli_query($conn, $Uquery) or die("Connessione fallita: " . mysqli_error($conn));
+               if ($edit_exec) echo "Modificato";
+          } else echo "Dati corrotti";
+     }
 }
 
 if (isset($_GET['blog'])) {
@@ -160,4 +162,3 @@ if (isset($_POST['invia_commento'])) {
      } else echo "Dati corrotti";
 }
 mysqli_close($conn);
-?>

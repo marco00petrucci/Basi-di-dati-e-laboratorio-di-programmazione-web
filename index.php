@@ -6,18 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bloggy | Home</title>
     <style>
-        @import url("index.css");
+        @import url("style.css");
         @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 
         #load_data_message {
-            margin: 0 32%;
+            margin: 0 32%
         }
 
         #load_data_message p {
             background: #fff;
             border-radius: 10px;
             padding: 1% 0%;
-            text-align: center;
+            text-align: center
         }
 
         #load_data_message button {
@@ -25,15 +25,16 @@
             border-radius: 10px;
             text-align: center;
             padding: 8px 25px;
+            border: none;
             border-bottom: 3px solid firebrick;
             cursor: pointer;
-            transition: .5s;
+            transition: .5s
         }
 
         #load_data_message button:hover {
             padding: 10px 26px;
             text-decoration: underline;
-            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.4);
+            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.4)
         }
     </style>
     <link rel="icon" href="image/logo_icona.png" />
@@ -87,7 +88,8 @@
                     }
                 });
             } else {
-                $('#load_data_message').html("<button>Carica altri post</button>");
+
+                // Permetti di caricare altri 3 post cliccando sul button nei telefoni
                 $('#load_data_message').click(function() {
                     $('#load_data_message').html("<p>Caricamento....&nbsp;<img src='../image/ajax-loader.gif' alt='Loader' /></p>");
                     start += 3;
@@ -118,16 +120,18 @@
     }
 
     // Se si sceglie di cancellare l'account
-    if (isset($_GET['disiscrizione']) && isset($_SESSION['user_session']) && $_GET['disiscrizione'] == "eliminato") {
-        mysqli_query($conn, "DELETE FROM users WHERE username = '$_SESSION[user_session]'") or die("Connessione fallita: " . mysqli_error($conn));
-        unset($_SESSION['user_session']);
-        if (session_destroy()) {
-            echo "<div class='avviso'>
+    if (isset($_GET['delete_user'])) {
+        if (isset($_SESSION['user_session']) && $_GET['delete_user'] == $_SESSION['user_session']) {
+            mysqli_query($conn, "DELETE FROM users WHERE username = '$_SESSION[user_session]'") or die("Connessione fallita: " . mysqli_error($conn));
+            unset($_SESSION['user_session']);
+            if (session_destroy()) {
+                echo "<div class='avviso'>
                     <h1><img src='image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
                     <p>Hai correttamente cancellato il tuo account.</p>
                     <script>setTimeout('window.location.href = \"index.php\"', 2500);</script>
                  </div>";
-        }
+            }
+        } else header("Location: index.php?no_access");
     }
 
     // Se si entra in una pagina alla quale non si può accedere

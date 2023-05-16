@@ -17,11 +17,89 @@ if (isset($_GET['username'])) {
      <meta charset="utf-8">
      <meta name="viewport" content="width=device-width, initial-scale=1">
      <title>Bloggy | <?php
-                         if (isset($_SESSION['user_session']) && !isset($_GET["username"])) echo $_SESSION['user_session'];
+                         if (isset($_SESSION['user_session']) && !isset($_GET["username"])) echo "Account";
                          else echo $_GET["username"]; ?></title>
      <style>
-          @import url("../index.css");
+          @import url("../style.css");
           @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+
+          /* Modifica dati utente */
+
+          .visualizza_dati_utente {
+               background: var(--sfondo_post);
+               margin: 1% 45% 2% 1%;
+               padding: 2%;
+               border-radius: 20px;
+               border-top-right-radius: 300px;
+               border-bottom-right-radius: 10px;
+          }
+
+          .form_center.edit {
+               display: none;
+          }
+
+          #edit_form {
+               margin: 0 2%;
+          }
+
+          .edit_box {
+               width: 30%;
+               padding: 1%;
+          }
+
+          .edit_box:focus {
+               width: 31%;
+               padding: 1%
+          }
+
+          #avatar_form {
+               width: 200px;
+               padding: 2% 10% 2% 0;
+          }
+
+          #avatar {
+               width: 200px;
+               border-radius: 10px;
+               cursor: zoom-in;
+          }
+
+          #fullscreen {
+               width: 100%;
+               display: none;
+               position: absolute;
+               top: 30%;
+               left: 1%;
+               z-index: 1
+          }
+
+          #fullscreen img {
+               width: 30%;
+               background: #fff;
+               border-radius: 20px;
+               transition: .5s;
+               cursor: zoom-out;
+          }
+
+          #fullscreen img:hover {
+               width: 31%;
+               border-radius: 0;
+          }
+
+          #U_avatar::before {
+               content: "Scegli nuovo avatar";
+          }
+
+          @media screen and (max-width:950px) {
+               #edit_form input {
+                    width: 50%
+               }
+          }
+
+          @media screen and (max-width:1200px) {
+               .visualizza_dati_utente {
+                    margin: 0 3% 3%
+               }
+          }
      </style>
      <link rel="icon" href="../image/logo_icona.png" />
      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -43,23 +121,13 @@ if (isset($_GET['username'])) {
                     $("#fullscreen").fadeOut();
                });
 
-               // Rendi cliccabili i bottoni 'modifica utente' quando viene digitato del testo nei campi
-               $(".edit_box").keyup(function() {
-                    $("#modifica_btn, #reset").css({
+               // Rendi cliccabile il bottoni 'Cambia avatar' quando si sceglie un file
+               $("#U_avatar").click(function() {
+                    $("#modifica_avatar").css({
                          "opacity": "1",
                          "pointer-events": "auto"
                     });
-               });
-
-               // Aggiungi la possibilità di cancellare il testo digitato
-               $('.reg-login_box:not(#Rpassword, #Rcpassword, #Lpassword)').wrap('<span class="deleteicon" />').after($('<span>').click(function() {
-                    $(this).prev('.reg-login_box').val('').trigger('change').focus();
-               }));
-
-               // Regex per il telefono
-               $.validator.addMethod("tel_regex", function(value, element) {
-                    return this.optional(element) || /^[0-9]{9,10}$/i.test(value);
-               });
+               })
 
                // Gestire la convalida del form per modificare l'avatar
                $("#avatar_form").validate({
@@ -69,6 +137,35 @@ if (isset($_GET['username'])) {
                     messages: {
                          U_avatar: "<p class='messaggi'>Per favore inserisci un'avatar.</p>"
                     }
+               });
+
+
+               // Regex per il telefono
+               $.validator.addMethod("tel_regex", function(value, element) {
+                    return this.optional(element) || /^[0-9]{9,10}$/i.test(value);
+               });
+
+               // Rendi cliccabili i bottoni 'modifica utente' quando viene digitato del testo nei campi
+               $(".edit_box").keyup(function() {
+                    $("#modifica_btn, #reset").css({
+                         "opacity": "1",
+                         "pointer-events": "auto"
+                    });
+               });
+
+               $('.edit_box').wrap('<span class="deleteicon" />').after($('<span>').click(function() {
+                    $(this).prev('.edit_box').val('').trigger('change').focus();
+               }));
+
+               // Quando si clicca su Password apre il box "Conferma password"
+               $("#change_psw").click(function() {
+                    $("#new_password").slideDown(400);
+                    $("#change_psw").fadeOut();
+               });
+
+               // Rendi cliccabili i bottoni 'modifica utente' quando viene digitato del testo nei campi
+               $("#Mcpassword").click(function() {
+                    $(".pswd").fadeIn(300)
                });
 
                // Gestire la convalida del form della modifica dati user
@@ -96,12 +193,12 @@ if (isset($_GET['username'])) {
                          Mtelefono: "<p class='messaggi'>Inserisci un numero di telefono valido.</p>",
                          Memail: "<p class='messaggi'>Per favore inserisci un indirizzo email valido.</p>",
                          Mpassword: {
-                              required: "<p class='messaggi'>Per favore fornisci la password.</p>",
+                              required: "<p class='messaggi pswd' style='display:none'>Per favore fornisci la password.</p>",
                               minlength: "<p class='messaggi'>La password deve avere minimo 8 caratteri.</p>",
                               maxlength: "<p class='messaggi'>La password non deve avere più di 15 caratteri.</p>"
                          },
                          Mcpassword: {
-                              required: "<p class='messaggi'>Per favore reinserisci la password.</p>",
+                              required: "<p class='messaggi pswd' style='display:none'>Per favore reinserisci la password.</p>",
                               equalTo: "<p class='messaggi'>Le password non corrispondono!</p>"
                          }
                     },
@@ -118,47 +215,59 @@ if (isset($_GET['username'])) {
 
                               // Se si modifica l'account, reinderizza alla dashboard
                               if (risposta == "Modificato") {
-                                   $("#error").fadeIn(400).html("Modifica effettuata! 😄");
+                                   $("#delete_on_mess").fadeOut();
+                                   $("#error").css("display", "table");
+                                   $("#error").html("Modifica effettuata! 😄");
                                    $("#modifica_btn").html('<img src="../image/ajax-loader.gif" alt="Loader" />&nbsp;Invio...');
                                    $('body').delay(1300).fadeOut();
-                                   setTimeout('window.location.href = "dashboard.php"', 1600);
+                                   setTimeout('window.location.href = "account.php"', 1600);
                               }
 
                               // Se la email è già stata utilizzata
-                              else if (risposta == "Email invariata") $("#error").fadeIn(400).html('<img src="../image/warning.svg" alt="Warning" width="20px" height="20px" >&nbsp;Spiacenti, email invariata');
-
-                              // Se la email è già stata utilizzata
-                              else if (risposta == "Email già esistente") $("#error").fadeIn(400).html('<img src="../image/warning.svg" alt="Warning" width="20px" height="20px" >&nbsp;Spiacenti, email già utilizzata! 😯');
+                              else if (risposta == "Email già esistente") {
+                                   $("#delete_on_mess").fadeOut();
+                                   $("#error").css("display", "table");
+                                   $("#error").html('<img src="../image/warning.svg" alt="Warning" width="20px" height="20px" >&nbsp;Spiacenti, email già utilizzata! 😯');
+                              }
 
                               // Se sono stati inseriti caratteri tipici della SQL Injection
-                              else if (risposta == "Dati corrotti") $("#error").fadeIn(400).html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;No dati corrotti su questo sito...');
+                              else if (risposta == "Dati corrotti") {
+                                   $("#delete_on_mess").fadeOut();
+                                   $("#error").css("display", "table");
+                                   $("#error").html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;No dati corrotti su questo sito...');
+                              }
 
                               // Se qualcosa è andato storto
-                              else $("#error").fadeIn(400).html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;Qualcosa è andato storto! 😓');
+                              else {
+                                   $("#delete_on_mess").fadeOut();
+                                   $("#error").css("display", "table");
+                                   $("#error").html('<img src="../image/danger.svg" alt="Errore" width="20px" height="20px" >&nbsp;Qualcosa è andato storto! 😓');
+                              }
                          }
                     });
                     return false;
                }
-
-               $('.edit_box:not(#Mpassword, #Mcpassword)').wrap('<span class="deleteicon" />').after($('<span>').click(function() {
-                    $(this).prev('.edit_box').val('').trigger('change').focus();
-               }));
-
-               // Quando si clicca su Password apre il box "Conferma password"
-               $("#Mpassword").keyup(function() {
-                    $("#conferma_pass").slideDown(400);
-               });
           });
      </script>
 </head>
 
 <body id="account">
      <?php
-     if (isset($_GET['disiscrizione']) && $_GET['disiscrizione'] == "error") {
-          echo "<div class='avviso'>
-                    <h1><img src='../image/warning.svg' alt='Cerca' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
-                    <p>Prima di poterti disiscrivere devi eliminare i tuoi <a href='dashboard.php'>blog</a> dal sito!</p>
-                    <script>setTimeout(\"window.location.href = 'account.php'\", 2500);</script>
+     if (isset($_GET['delete_data'])) {
+          echo "<div class='avviso no_timeout'>
+                    <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                    <p>Sei sicuro di voler eliminare il tuo account?<br>Verranno eliminati anche TUTTI i blog e i post che hai creato!</p>
+                    <a href='../index.php?delete_user=$_SESSION[user_session]'>SI</a>&emsp;
+                    <a href='account.php'>NO</a>
+               </div>";
+     }
+
+     if (isset($_GET['delete_no_data'])) {
+          echo "<div class='avviso no_timeout'>
+                    <h1><img src='../image/warning.svg' alt='Alt!' width='25px' height='25px' >&nbsp;ATTENZIONE!</h1>
+                    <p>Sei sicuro di voler eliminare il tuo account?</p>
+                    <a href='../index.php?delete_user=$_SESSION[user_session]'>SI</a>&emsp;
+                    <a href='account.php'>NO</a>
                </div>";
      } ?>
 
@@ -286,12 +395,12 @@ if (isset($_GET['username'])) {
 
                     // Mostra l'avatar
                     echo "<img src = '$imageURL_selected' id='avatar' alt='Avatar'/>
-                              <div id='fullscreen'>
-                                   <img src='' alt='Avatar'/>
-                              </div>";
+                         <div id='fullscreen'>
+                              <img src='' alt='Avatar'/>
+                         </div>";
 
                     // Nome e cognome
-                    echo '<h3>' . $row['nome'] . ' ' . $row['cognome'] . '</h3><br>';
+                    echo '<h3>' . $row['nome'] . ' ' . $row['cognome'] . '</h3>';
 
                     // Admin e iscritto dal
                     if ($row['admin'] == 1) echo '<p>Utente amministratore ';
@@ -306,7 +415,7 @@ if (isset($_GET['username'])) {
                     else echo '<p>Telefono: <a href="tel:' . $row['telefono'] . '">' . $row['telefono'] . '</a></p>';
 
                     // Se non viene cercato nessun account che non sia quello attivo nella sessione
-                    if (isset($_SESSION['user_session']) && $row['username'] == $_SESSION['user_session']) { ?>
+                    if (isset($_SESSION['user_session']) && ($username == $_SESSION['user_session'])) { ?>
                          <a href="account.php?modifica">
                               <button type="submit" class="button_form" id="edit_profile" name="edit_profile">
                                    <img src="../image/user.png" class="button_icon" alt="Icona modifica account">&ensp;Modifica i dati
@@ -316,23 +425,13 @@ if (isset($_GET['username'])) {
 
                          // Verifica che, se si vuole eliminare l'account, non si abbiano blog o post
                          $autore_query = mysqli_query($conn, "SELECT * FROM blog AS b, post AS p WHERE b.autore = '$_SESSION[user_session]' OR b.co_autore = '$_SESSION[user_session]' OR p.autore = '$_SESSION[user_session]'") or die("Connessione fallita: " . mysqli_error($conn));
-                         if (mysqli_num_rows($autore_query) > 0) {
-                              $autore_row = mysqli_fetch_array($autore_query);
-                         ?>
-                              <a href="account.php?disiscrizione=error">
-                                   <button type="submit" class="button_form" id="disiscrizione">
-                                        <img src="../image/delete_user.png" class="button_icon" alt="Disiscriviti">&nbsp;Disiscriviti
-                                   </button>
-                              </a>
-                         <?php
-                         } else { ?>
-                              <a href="../index.php?disiscrizione=eliminato">
-                                   <button type="submit" class="button_form" id="disiscrizione">
-                                        <img src="../image/delete_user.png" class="button_icon" alt="Disiscriviti">&nbsp;Disiscriviti
-                                   </button>
-                              </a>
+                         if (mysqli_num_rows($autore_query) > 0) echo "<a href='account.php?delete_data'>";
+                         else echo "<a href='account.php?delete_no_data'>"; ?>
+                         <button type="submit" class="button_form" id="disiscrizione">
+                              <img src="../image/delete_user.png" class="button_icon" alt="Disiscriviti">&nbsp;Disiscriviti
+                         </button>
+                         </a>
                     <?php
-                         }
                     }
                } else { ?>
                     <!-- Se si sceglie di modificare l'account -->
@@ -348,9 +447,12 @@ if (isset($_GET['username'])) {
                          ?>
 
                          <input type='file' name='U_avatar' id='U_avatar' title="Scegli nuovo avatar" onchange="document.getElementById('avatar').src = window.URL.createObjectURL(this.files[0])"></input>
-                         <p class='messaggi'>
-                              <?php
-                              if (isset($_POST['modifica_avatar'])) {
+
+                         <?php
+                         if (isset($_POST['U_avatar'])) { ?>
+                              <p class='messaggi'>
+
+                                   <?php
                                    $username = $_SESSION['user_session'];
                                    $targetDir = "../image/";
                                    $fileName = basename($_FILES["U_avatar"]["name"]);
@@ -376,11 +478,12 @@ if (isset($_GET['username'])) {
                                              } else echo "Caricamento dell'avatar fallito, Per favore riprova 🤞";
                                         } else echo "Spiacenti, il tuo avatar supera 1MB.";
                                    } else echo 'Spiacenti, sono supportate solo le immagini di tipo JPG, JPEG, PNG, GIF. 📸';
-                              }
-                              ?>
-                         </p>
+                                   ?>
+                              </p>
+                         <?php
+                         } ?>
 
-                         <button type="submit" class="button_form" id="modifica_avatar" name="modifica_avatar">
+                         <button type="submit" class="button_form" id="modifica_avatar" name="modifica_avatar" style="opacity:.7; pointer-events: none">
                               <img src="../image/user.png" class="button_icon" alt="Icona modifica account">&ensp;Cambia avatar
                          </button>
                     </form>
@@ -407,49 +510,49 @@ if (isset($_GET['username'])) {
                          // Email
                          echo '<label for="Memail">Email:</label>
                                    <input type="email" class="edit_box" name="Memail" value="' . $row['email'] . '"></input><br>
-                                   <input type="hidden" value="' . $row["email"] . '" name="email_vecchia"/>';
+                                   <input type="hidden" value="' . $row["email"] . '" name="email_vecchia"/>
+                                   <button type="submit" class="button_form" id="change_psw" style="padding: 3px 7px">Cambia password</button>';
 
-                         // // Password
-                         // echo '<label for="Mpassword">Password:</label>
-                         //           <input type="password" class="edit_box" name="Mpassword" id="Mpassword" value=""></input><br>';
+                         // Password
+                         echo '<div id="new_password" style="display:none">
+                                   <label for="Mpassword">Password:</label>
+                                   <input type="password" class="edit_box" name="Mpassword" id="Mpassword" value=""></input><br>';
 
-                         // // Conferma password
-                         // echo '<div id="conferma_pass" style="display:none">
-                         //           <label for="Mcpassword" id="conferma">Conferma password:</label>
-                         //           <input type="password" class="edit_box" name="Mcpassword" id="Mcpassword" placeholder="Reinserisci password"></input>
-                         //      </div>';
+                         // Conferma password
+                         echo '<label for="Mcpassword" id="conferma">Conferma password:</label>
+                              <input type="password" class="edit_box" name="Mcpassword" id="Mcpassword" placeholder="Reinserisci password"></input>
+                              </div>';
                          ?>
+
+                         <div id="error" style="padding:2px 6px"></div><br id="delete_on_mess">
+
+                         <button type="submit" class="button_form" id="modifica_btn" name="modifica_btn" style="opacity:.7; pointer-events: none">
+                              <img src="../image/user.png" class="button_icon" alt="Icona modifica account">&nbsp;Cambia
+                         </button>
+
+                         <a href="account.php" class="button_form" style="padding: 8px 12px">
+                              <img src="../image/meno.png" class="button_icon" alt="Annulla" style="vertical-align: middle">Annulla
+                         </a>
+                    </form>
+               <?php
+               } ?>
           </div>
 
-          <div id="error"></div><br>
+          <h2>BLOG DELL'UTENTE</h2>
+          <?php
+          if (!isset($_GET['username'])) $user_username = $username;
+          else $user_username = $_GET['username'];
+          $load_post = mysqli_query($conn, "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog WHERE autore = '$user_username' OR co_autore = '$user_username' ORDER BY nome_blog ASC") or die("Connessione fallita: " . mysqli_error($conn));
+          if (mysqli_num_rows($load_post) > 0) {
+               while ($result = mysqli_fetch_assoc($load_post)) {
+                    $blog_immagine = $result['immagine'];
+                    $blog_nome = $result['nome_blog'];
+                    $blog_autore = $result['autore'];
+                    $blog_co_autore = $result['co_autore'];
+                    $creato_il = $result['niceDate'];
 
-          <button type="submit" class="button_form" id="modifica_btn" name="modifica_btn" style="opacity:.7; pointer-events: none;">
-               <img src="../image/user.png" class="button_icon" alt="Icona modifica account">&nbsp;Cambia
-          </button>
-
-          <a href="account.php" class="button_form" style="padding: 8px 12px">
-               <img src="../image/meno.png" class="button_icon" alt="Annulla" style="vertical-align: middle">Annulla
-          </a>
-          </form>
-     <?php
-               } ?>
-     </div>
-
-     <h2>BLOG DELL'UTENTE</h2>
-     <?php
-     if (!isset($_GET['username'])) $user_username = $username;
-     else $user_username = $_GET['username'];
-     $load_post = mysqli_query($conn, "SELECT *, DATE_FORMAT(creato_il, '%W %d %M %Y, %H:%i') AS niceDate FROM blog WHERE autore = '$user_username' OR co_autore = '$user_username' ORDER BY nome_blog ASC") or die("Connessione fallita: " . mysqli_error($conn));
-     if (mysqli_num_rows($load_post) > 0) {
-          while ($result = mysqli_fetch_assoc($load_post)) {
-               $blog_immagine = $result['immagine'];
-               $blog_nome = $result['nome_blog'];
-               $blog_autore = $result['autore'];
-               $blog_co_autore = $result['co_autore'];
-               $creato_il = $result['niceDate'];
-
-               // Stampa i blog
-               echo "<div class='blog' id='blog_$blog_nome'>
+                    // Stampa i blog
+                    echo "<div class='blog' id='blog_$blog_nome'>
                               <a href='../blog.php?testoCerca=$blog_nome'>
                                    <img src='../image/$blog_immagine' alt='Immagine blog'>
                               </a>
@@ -457,122 +560,122 @@ if (isset($_GET['username'])) {
                                    <a href='../blog.php?testoCerca=$blog_nome' style='color:rgb(99, 10, 13)'>$blog_nome</a>
                               </h1>";
 
-               // Se esiste un co-autore
-               if ($blog_co_autore != null) {
-                    echo "<p>
+                    // Se esiste un co-autore
+                    if ($blog_co_autore != null) {
+                         echo "<p>
                                    <a href='account.php?username=$blog_autore' style='color:rgb(99, 10, 13)'>$blog_autore</a> e 
                                    <a href='account.php?username=$blog_co_autore' style='color:rgb(99, 10, 13)'>$blog_co_autore</a>  - " . ucfirst($creato_il) . "
                               </p>";
-                    if (!isset($_GET['username'])) {
-                         echo "<a href='new_blog.php?aggiungi_post=$blog_nome'>
+                         if (!isset($_GET['username'])) {
+                              echo "<a href='new_blog.php?aggiungi_post=$blog_nome'>
                                         <button type='submit' class='button_form add_post' style='padding:6px 8px'>
                                              <img src='../image/add.png' class='icona add_post' alt='Icona modifica account'>&nbsp;Aggiungi post
                                         </button>
                                         </a>";
-                    }
-               } else {
-                    echo "<p>
+                         }
+                    } else {
+                         echo "<p>
                                    <a href='account.php?username=$blog_autore' style='color:rgb(99, 10, 13)'>$blog_autore</a> - " . ucfirst($creato_il) . "
                               </p>";
-                    if (!isset($_GET['username'])) {
-                         echo "<a href='new_blog.php?aggiungi_post=$blog_nome'>
+                         if (!isset($_GET['username'])) {
+                              echo "<a href='new_blog.php?aggiungi_post=$blog_nome'>
                                         <button type='submit' class='button_form add_post' style='padding:6px 8px'>
                                              <img src='../image/add.png' class='icona add_post' alt='Icona modifica account'>&nbsp;Aggiungi post
                                         </button>
                                    </a>";
-                    }
-               }
-               echo "</div>";
-          }
-     } else {
-          // Se si accede al proprio profilo
-          if (!isset($_GET['username'])) {
-               echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Nessun blog. <a href='new_blog.php'>Aggiungine uno!</a></h3>";
-          }
-          // Se viene cercato un utente
-          else echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Questo utente non ha nessun blog.</h3>";
-     } ?>
-
-     <aside>
-          <!-- Blog -->
-          <div id="blog">
-               <h4><a href="blog.php">Blog</a></h4>
-               <ul>
-                    <?php
-                    $find_blog = mysqli_query($conn, "SELECT nome_blog FROM blog ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($nome_blog = mysqli_fetch_assoc($find_blog)) {
-                         echo "<li>
-                                        <a href='../blog.php?testoCerca=$nome_blog[nome_blog]'>$nome_blog[nome_blog]</a>
-                                   </li>";
-                    } ?>
-               </ul>
-          </div>
-
-          <!-- Categorie -->
-          <div id="categorie">
-               <h4>Categorie</h4>
-               <ul>
-                    <?php
-                    $find_cat = mysqli_query($conn, "SELECT DISTINCT categoria FROM post LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($categoria = mysqli_fetch_assoc($find_cat)) {
-                         echo "<li>
-                                        <a href='../blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
-                                   </li>";
-                    }
-                    ?>
-               </ul>
-          </div>
-
-          <!-- Post recenti -->
-          <div id="post_recenti">
-               <h4>Post recenti</h4>
-               <ul>
-                    <?php
-                    $find_post = mysqli_query($conn, "SELECT id, titolo FROM post ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($post = mysqli_fetch_assoc($find_post)) {
-                         echo "<li>
-                                        <a href='../single.php?id=$post[id]'>$post[titolo]</a>
-                                   </li>";
-                    } ?>
-               </ul>
-          </div>
-
-          <!--  Utenti registrati al sito -->
-          <div id="users_in_site">
-               <h4>Utenti registrati</h4>
-               <ul>
-                    <?php
-                    // Cerca gli utenti registrati nel database
-                    $execution = mysqli_query($conn, "SELECT username, avatar FROM users ORDER BY add_data ASC LIMIT 5") or die("Connessione fallita: " . mysqli_error($conn));
-                    while ($utenti_registrati = mysqli_fetch_assoc($execution)) {
-                         $username = $utenti_registrati['username'];
-                         $imageURL = '../image/' . $utenti_registrati["avatar"];
-
-                         // Conta quanti blog hanno gli utenti registrati
-                         $count_blog = mysqli_query($conn, "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
-                         $count = mysqli_fetch_array($count_blog)['count_blog'] . " blog";
-                         if ($count == "0 blog") $count = "Nessun blog";
-
-                         if (isset($_SESSION['user_session']) && $username == $_SESSION['user_session']) {
-                              echo "<li id='per_utenti'>
-                                             <a href='account.php'>
-                                                  <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
-                                             </a>- $count
-                                         </li>";
-                         } else {
-                              // Stampa risultato
-                              echo "<li id='per_utenti'>
-                                             <a href='account.php?username=$username'>
-                                                  <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
-                                             </a>- $count
-                                        </li>";
                          }
                     }
-                    mysqli_close($conn);
-                    ?>
-               </ul>
-          </div>
-     </aside>
+                    echo "</div>";
+               }
+          } else {
+               // Se si accede al proprio profilo
+               if (!isset($_GET['username'])) {
+                    echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Nessun blog. <a href='new_blog.php'>Aggiungine uno!</a></h3>";
+               }
+               // Se viene cercato un utente
+               else echo "<h3 style='background:rgb(255,255,255,.7); width:18%; margin-left:2%; padding-left: 1%; border-radius:20px'>Questo utente non ha nessun blog.</h3>";
+          } ?>
+
+          <aside>
+               <!-- Blog -->
+               <div id="blog">
+                    <h4><a href="../blog.php">Blog</a></h4>
+                    <ul>
+                         <?php
+                         $find_blog = mysqli_query($conn, "SELECT nome_blog FROM blog ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($nome_blog = mysqli_fetch_assoc($find_blog)) {
+                              echo "<li>
+                                   <a href='../blog.php?testoCerca=$nome_blog[nome_blog]'>$nome_blog[nome_blog]</a>
+                              </li>";
+                         } ?>
+                    </ul>
+               </div>
+
+               <!-- Categorie -->
+               <div id="categorie">
+                    <h4>Categorie</h4>
+                    <ul>
+                         <?php
+                         $find_cat = mysqli_query($conn, "SELECT DISTINCT categoria FROM post LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($categoria = mysqli_fetch_assoc($find_cat)) {
+                              echo "<li>
+                                   <a href='../blog.php?testoCerca=$categoria[categoria]'>$categoria[categoria]</a>
+                              </li>";
+                         }
+                         ?>
+                    </ul>
+               </div>
+
+               <!-- Post recenti -->
+               <div id="post_recenti">
+                    <h4>Post recenti</h4>
+                    <ul>
+                         <?php
+                         $find_post = mysqli_query($conn, "SELECT id, titolo FROM post ORDER BY creato_il DESC LIMIT 10") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($post = mysqli_fetch_assoc($find_post)) {
+                              echo "<li>
+                                   <a href='../single.php?id=$post[id]'>$post[titolo]</a>
+                              </li>";
+                         } ?>
+                    </ul>
+               </div>
+
+               <!--  Utenti registrati al sito -->
+               <div id="users_in_site">
+                    <h4>Utenti registrati</h4>
+                    <ul>
+                         <?php
+                         // Cerca gli utenti registrati nel database
+                         $execution = mysqli_query($conn, "SELECT username, avatar FROM users ORDER BY add_data ASC LIMIT 5") or die("Connessione fallita: " . mysqli_error($conn));
+                         while ($utenti_registrati = mysqli_fetch_assoc($execution)) {
+                              $username = $utenti_registrati['username'];
+                              $imageURL = '../image/' . $utenti_registrati["avatar"];
+
+                              // Conta quanti blog hanno gli utenti registrati
+                              $count_blog = mysqli_query($conn, "SELECT COUNT(*) AS count_blog FROM blog WHERE autore = '$username' OR co_autore = '$username'") or die("Connessione fallita: " . mysqli_error($conn));
+                              $count = mysqli_fetch_array($count_blog)['count_blog'] . " blog";
+                              if ($count == "0 blog") $count = "Nessun blog";
+
+                              if (isset($_SESSION['user_session']) && $username == $_SESSION['user_session']) {
+                                   echo "<li id='per_utenti'>
+                                        <a href='account.php'>
+                                             <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
+                                        </a>- $count
+                                        </li>";
+                              } else {
+                                   // Stampa risultato
+                                   echo "<li id='per_utenti'>
+                                        <a href='account.php?username=$username'>
+                                             <img src = '$imageURL' id='users_in_site_icon' alt='Avatar'/>$username
+                                        </a>- $count
+                                   </li>";
+                              }
+                         }
+                         mysqli_close($conn);
+                         ?>
+                    </ul>
+               </div>
+          </aside>
      </main>
 
      <img src="../image/button_top.svg" id="button_top" alt="Vai all'inizio della pagina">

@@ -15,7 +15,7 @@ if (isset($_GET['login'])) $nome_pagina = "Login";
      <meta name="viewport" content="width=device-width, initial-scale=1">
      <title>Bloggy | <?php echo $nome_pagina; ?></title>
      <style>
-          @import url("../index.css");
+          @import url("../style.css");
           @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
      </style>
      <link rel="icon" href="../image/logo_icona.png" />
