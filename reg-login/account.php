@@ -441,22 +441,20 @@ if (isset($_GET['username'])) {
                          <?php
                          // Mostra l'avatar
                          echo "<img src = '$imageURL' id='avatar' alt='Avatar'/>
-                                   <div id='fullscreen'>
-                                        <img src='' alt='Avatar'/>
-                                   </div>";
+                              <div id='fullscreen'>
+                                   <img src='' alt='Avatar'/>
+                              </div>";
                          ?>
 
                          <input type='file' name='U_avatar' id='U_avatar' title="Scegli nuovo avatar" onchange="document.getElementById('avatar').src = window.URL.createObjectURL(this.files[0])"></input>
 
-                         <?php
-                         if (isset($_POST['U_avatar'])) { ?>
-                              <p class='messaggi'>
+                         <p class='messaggi'>
+                              <?php
+                              if (isset($_POST['modifica_avatar'])) { ?>
 
                                    <?php
-                                   $username = $_SESSION['user_session'];
-                                   $targetDir = "../image/";
                                    $fileName = basename($_FILES["U_avatar"]["name"]);
-                                   $file_target =  $targetDir . $fileName;
+                                   $file_target =  "../image/" . $fileName;
                                    $fileType = strtolower(pathinfo($file_target, PATHINFO_EXTENSION));
                                    $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
 
@@ -468,7 +466,7 @@ if (isset($_GET['username'])) {
 
                                              // Se è tutto apposto, inserisci il nome del file nel database
                                              if (move_uploaded_file($_FILES["U_avatar"]["tmp_name"], $file_target)) {
-                                                  $update = "UPDATE users SET avatar = '$fileName' WHERE username = '$username'";
+                                                  $update = "UPDATE users SET avatar = '$fileName' WHERE username = '$_SESSION[user_session]'";
                                                   mysqli_query($conn, $update) or die("Connessione fallita: " . mysqli_error($conn));
                                                   echo "L'avatar " . $fileName . " è stato caricato con successo! 📁😁.";
                                                   echo "<script>
@@ -479,9 +477,9 @@ if (isset($_GET['username'])) {
                                         } else echo "Spiacenti, il tuo avatar supera 1MB.";
                                    } else echo 'Spiacenti, sono supportate solo le immagini di tipo JPG, JPEG, PNG, GIF. 📸';
                                    ?>
-                              </p>
-                         <?php
-                         } ?>
+                              <?php
+                              } ?>
+                         </p>
 
                          <button type="submit" class="button_form" id="modifica_avatar" name="modifica_avatar" style="opacity:.7; pointer-events: none">
                               <img src="../image/user.png" class="button_icon" alt="Icona modifica account">&ensp;Cambia avatar

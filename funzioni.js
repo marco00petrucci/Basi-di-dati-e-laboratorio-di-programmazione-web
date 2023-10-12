@@ -207,7 +207,7 @@ $(function () {
                     $('aside').css({ 'position': 'fixed', 'top': '-30%', "transition": ".1s ease-out" });
                     if (window.matchMedia("(max-width: 1600px)").matches) $('aside').css({ 'top': '-60%', "transition": ".1s ease-out" }); // Per gli schermi fino a 1600px di larghezza
                 }
-            } else $('aside').css({ 'position': 'absolute', 'top': '20%', "transition": "none" });
+            } else $('aside').css({ 'position': 'absolute', 'top': '22%', "transition": "none" });
         }
 
         // Mostra icona Go to Top quando la pagina viene scrollata di 500px tranne che nei telefoni
